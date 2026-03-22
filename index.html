@@ -119,10 +119,16 @@ background:var(--card2);padding:6px 12px;border-radius:20px;font-size:13px;
 justify-content:center;font-size:14px;flex-shrink:0;z-index:1}
 .tl-line{width:2px;flex:1;background:#2a2a2a;min-height:8px}
 .tl-item:last-child .tl-line{display:none}
-.tl-body{flex:1;padding:4px 0 8px 0}
+.tl-body{flex:1;padding:4px 0 8px 0;position:relative}
 .tl-name{font-size:14px;font-weight:600;color:var(--text1)}
 .tl-detail{font-size:12px;color:var(--text2);margin-top:1px}
 .tl-time{font-size:11px;color:#666;margin-top:1px}
+.tl-delete{
+position:absolute;right:0;top:4px;background:none;border:none;
+color:var(--text3);font-size:16px;cursor:pointer;padding:4px 8px;
+opacity:0.4;transition:.15s;
+}
+.tl-delete:hover,.tl-delete:active{opacity:1;color:var(--accent-lift)}
 .pullup-quick-circles{display:flex;gap:8px}
 .pullup-qc{
 width:44px;height:44px;border-radius:50%;border:2px solid #555;
@@ -157,6 +163,7 @@ cursor:pointer;display:flex;align-items:center;justify-content:center;
 transition:.2s;
 }
 .set-circle.done{background:var(--accent-lift);border-color:var(--accent-lift);color:#fff}
+.set-circle.failed{background:#ff9800;border-color:#ff9800;color:#fff;font-size:11px}
 .exercise-done{display:flex;align-items:center;gap:8px;color:#4caf50;font-weight:600;font-size:16px}
 .weight-bump{
 margin-top:8px;display:flex;align-items:center;justify-content:space-between;
@@ -529,10 +536,19 @@ function renderTodayStretch(){
 function renderPullups(){
   const sets=LS.get(`pullups-${today()}`,[]);
   const c=$('#pullupSets');
-  c.innerHTML=sets.length?sets.map((r,i)=>`<span class="pullup-set">Set ${i+1}: ${r}</span>`).join(''):'<span class="empty">No sets yet</span>';
+  c.innerHTML=sets.length?sets.map((r,i)=>`<span class="pullup-set">Set ${i+1}: ${r} <span style="cursor:pointer;opacity:0.4;margin-left:4px" onclick="deletePullupSet(${i})">✕</span></span>`).join(''):'<span class="empty">No sets yet</span>';
   // Render quick circles
   const qc=$('#pullupQuickCircles');
   if(qc) qc.innerHTML=[3,4,5].map(n=>`<button class="pullup-qc" onclick="quickPullup(${n})">${n}</button>`).join('');
+}
+
+function deletePullupSet(idx){
+  const sets=LS.get(`pullups-${today()}`,[]);
+  sets.splice(idx,1);
+  LS.set(`pullups-${today()}`,sets);
+  renderPullups();
+  renderTodayPills();
+  showToast('Pull-up set removed');
 }
 
 function quickPullup(reps){
@@ -730,10 +746,26 @@ function renderTodayPills(){
         <div class="tl-name">${names[t.type]||t.type}</div>
         ${detail?`<div class="tl-detail">${detail}</div>`:''}
         <div class="tl-time">${timeStr}</div>
+        <button class="tl-delete" onclick="deleteActivity('${t.type}',${t.firstTs})" title="Remove">✕</button>
       </div>
     </div>`;
   });
   c.innerHTML=html;
+}
+
+function deleteActivity(type,firstTs){
+  const key=`activities-${today()}`;
+  let acts=LS.get(key,[]);
+  // Remove all entries of this type that share the timestamp group
+  acts=acts.filter(a=>a.type!==type);
+  LS.set(key,acts);
+  // Also remove from specific logs
+  if(type==='pullup'){
+    LS.set(`pullups-${today()}`,[]);
+    renderPullups();
+  }
+  renderTodayPills();
+  showToast('Activity removed');
 }
 
 function logActivity(type,data){
@@ -772,10 +804,11 @@ function renderLift(){
     const key=ex.toLowerCase().replace(/\s/g,'_');
     const weight=LS.get(`weight-${key}`,45);
     const sets=todaySets[key]||[false,false,false,false,false];
-    const allDone=sets.every(Boolean);
+    const allDone=sets.every(s=>s==='done'||s==='failed'||s===true);
 
     if(allDone) return; // Exercise done — hide it
 
+    const failCount=sets.filter(s=>s==='failed').length;
     html+=`<div class="exercise-card" id="ex-${key}">`;
     html+=`<div class="exercise-header">
       <span class="exercise-name">${ex}</span>
@@ -783,11 +816,18 @@ function renderLift(){
         onchange="LS.set('weight-${key}',+this.value)" step="5">
       <span style="font-size:12px;color:var(--text3)">lbs</span></div>
     </div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 sets × 5 reps</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 sets × 5 reps${failCount?' · <span style="color:#ff9800">long-press = failed set</span>':' · hold to mark failed'}</div>
     <div class="sets-row">`;
     for(let i=0;i<5;i++){
-      html+=`<button class="set-circle ${sets[i]?'done':''}"
-        onclick="completeSet('${key}',${i})">${i+1}</button>`;
+      const st=sets[i];
+      const cls=st==='failed'?'failed':(st?'done':'');
+      const label=st==='failed'?'F':(i+1);
+      html+=`<button class="set-circle ${cls}"
+        onclick="completeSet('${key}',${i})"
+        oncontextmenu="event.preventDefault();failSet('${key}',${i})"
+        ontouchstart="startLongPress(event,'${key}',${i})"
+        ontouchend="cancelLongPress()"
+        ontouchmove="cancelLongPress()">${label}</button>`;
     }
     html+=`</div>`;
     html+=`</div>`;
@@ -797,7 +837,7 @@ function renderLift(){
   const allExDone=exercises.every(ex=>{
     const key=ex.toLowerCase().replace(/\s/g,'_');
     const sets=todaySets[key]||[false,false,false,false,false];
-    return sets.every(Boolean);
+    return sets.every(s=>s==='done'||s==='failed'||s===true);
   });
   if(allExDone&&exercises.length){
     html+=`<div class="card" style="text-align:center">
@@ -805,10 +845,19 @@ function renderLift(){
     exercises.forEach(ex=>{
       const key=ex.toLowerCase().replace(/\s/g,'_');
       const weight=LS.get(`weight-${key}`,45);
-      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a2a">
-        <span>${ex} — ${weight} lbs</span>
-        <button class="btn btn-sm" onclick="bumpWeight('${key}',5)">+5 lbs next time</button>
-      </div>`;
+      const sets=todaySets[key]||[];
+      const fails=sets.filter(s=>s==='failed').length;
+      if(fails>0){
+        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a2a">
+          <span>${ex} — ${weight} lbs <span style="color:#ff9800;font-size:12px">(${fails} failed)</span></span>
+          <span style="font-size:12px;color:var(--text3)">Keep weight</span>
+        </div>`;
+      } else {
+        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a2a">
+          <span>${ex} — ${weight} lbs ✓</span>
+          <button class="btn btn-sm" onclick="bumpWeight('${key}',5)">+5 lbs next time</button>
+        </div>`;
+      }
     });
     html+=`</div>`;
   }
@@ -816,14 +865,41 @@ function renderLift(){
   $('#liftExercises').innerHTML=html;
 }
 
+let longPressTimer=null;
+let longPressFired=false;
+function startLongPress(e,key,idx){
+  longPressFired=false;
+  longPressTimer=setTimeout(()=>{
+    longPressFired=true;
+    longPressTimer=null;
+    failSet(key,idx);
+  },600);
+}
+function cancelLongPress(){
+  if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}
+}
+
 function completeSet(key,idx){
+  if(longPressFired){longPressFired=false;return;} // was a long press
+  cancelLongPress();
   const todaySets=LS.get(`lift-${today()}`,{});
   if(!todaySets[key]) todaySets[key]=[false,false,false,false,false];
-  todaySets[key][idx]=true;
+  if(todaySets[key][idx]) return; // already done
+  todaySets[key][idx]='done';
   LS.set(`lift-${today()}`,todaySets);
   logActivity('lift',{exercise:key,set:idx+1});
   renderLift();
-  // Start rest timer
+  startRest();
+}
+
+function failSet(key,idx){
+  const todaySets=LS.get(`lift-${today()}`,{});
+  if(!todaySets[key]) todaySets[key]=[false,false,false,false,false];
+  todaySets[key][idx]='failed';
+  LS.set(`lift-${today()}`,todaySets);
+  logActivity('lift',{exercise:key,set:idx+1,failed:true});
+  showToast('Set marked as failed');
+  renderLift();
   startRest();
 }
 
@@ -1037,20 +1113,77 @@ function startRehabTimer(id,duration,tab){
   let remaining=duration;
   const el=$(`#timer-${id}`);
   if(!el) return;
+  el.style.color='var(--text)';
   el.textContent=`${remaining}s`;
   rehabTimers[id]=setInterval(()=>{
     remaining--;
+    if(remaining<=3&&remaining>0) el.style.color='var(--accent-lift)';
     el.textContent=`${remaining}s`;
     if(remaining<=0){
       clearInterval(rehabTimers[id]);
       ding(1,0.3);
-      el.textContent='Done!';
+      el.textContent='✓ Done!';
+      el.style.color='#4caf50';
       // Auto-increment rep count
       const exercises=tab==='back'?backStretches:tab==='lowback'?lowBackExercises:neckExercises;
       const ex=exercises.find(e=>e.id===id);
       if(ex) addRehabRep(tab,id,ex.reps);
+      // Auto-advance: if sided, check which side needs doing, then auto-start next
+      if(ex) autoAdvanceStretch(tab,id,ex);
     }
   },1000);
+}
+
+function autoAdvanceStretch(tab,id,ex){
+  const completed=LS.get(`rehab-${tab}-${today()}`,{});
+  const state=completed[id]||{leftDone:false,rightDone:false,reps:0,done:false};
+  const exercises=tab==='back'?backStretches:tab==='lowback'?lowBackExercises:neckExercises;
+
+  // If sided and right side not done, prompt for right side after brief pause
+  if(ex.sides&&!state.rightDone&&state.leftDone){
+    setTimeout(()=>{
+      markSide(tab,id,'right');
+      showToast(`${ex.name} — Right side`);
+      startRehabTimer(id,ex.hold,tab);
+    },1500);
+    return;
+  }
+
+  // If reps not maxed, auto-start next rep after pause
+  if(state.reps<ex.reps){
+    setTimeout(()=>{
+      showToast(`${ex.name} — Rep ${state.reps+1} of ${ex.reps}`);
+      // If sided, reset sides for next rep and start left
+      if(ex.sides){
+        const c2=LS.get(`rehab-${tab}-${today()}`,{});
+        if(c2[id]){c2[id].leftDone=false;c2[id].rightDone=false;LS.set(`rehab-${tab}-${today()}`,c2);}
+        markSide(tab,id,'left');
+        showToast(`${ex.name} — Left side`);
+      }
+      startRehabTimer(id,ex.hold,tab);
+    },2000);
+    return;
+  }
+
+  // Exercise complete — auto-advance to next exercise
+  const idx=exercises.findIndex(e=>e.id===id);
+  if(idx<exercises.length-1){
+    const next=exercises[idx+1];
+    setTimeout(()=>{
+      showToast(`Next: ${next.name}`);
+      // Scroll to next exercise
+      const nextEl=document.getElementById(`timer-${next.id}`);
+      if(nextEl) nextEl.scrollIntoView({behavior:'smooth',block:'center'});
+      if(next.isMotion) return; // motion exercises need manual cycling
+      if(next.sides){
+        markSide(tab,next.id,'left');
+        showToast(`${next.name} — Left side`);
+      }
+      startRehabTimer(next.id,next.hold,tab);
+    },2500);
+  } else {
+    setTimeout(()=>showToast('🎉 All exercises complete!'),1000);
+  }
 }
 
 function markSide(tab,id,side){
