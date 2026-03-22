@@ -291,6 +291,23 @@ pointer-events:none;white-space:nowrap;
 .toast.show{transform:translateX(-50%) translateY(0)}
 @media(min-width:769px){.toast{top:76px}}
 
+/* LEGEND FILTER */
+.legend-btn{
+display:inline-flex;align-items:center;gap:4px;padding:4px 10px;
+border-radius:14px;border:1px solid #333;background:transparent;
+color:var(--text2);font-size:11px;cursor:pointer;transition:.15s;
+}
+.legend-btn.active{border-color:currentColor;color:var(--text)}
+.legend-btn .ldot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* SPARKLINE */
+.sparkline{display:inline-block;vertical-align:middle}
+
+/* WEEKLY SUMMARY */
+.week-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #1e1e1e}
+.week-row:last-child{border-bottom:none}
+.week-bar{height:6px;border-radius:3px;background:var(--accent-lift);min-width:2px;transition:width .3s}
+
 /* DATA MANAGEMENT */
 .data-actions{display:flex;gap:8px;margin-top:16px}
 .data-actions .btn{flex:1;font-size:13px}
@@ -432,7 +449,11 @@ pointer-events:none;white-space:nowrap;
 <div class="section" id="sec-history">
 <h1>History</h1>
 <div class="stats-grid" id="statsGrid"></div>
+
+<div class="card" id="weeklySummary"></div>
+
 <h3 style="margin-top:16px">Activity Heatmap — Last 6 Months</h3>
+<div id="heatmapLegend" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px"></div>
 <div class="heatmap-wrap">
 <div class="month-labels" id="monthLabels"></div>
 <div class="heatmap-container">
@@ -778,6 +799,22 @@ function logActivity(type,data){
   if(!idx.includes(today())){idx.push(today());LS.set('activity-dates',idx)}
 }
 
+// ── SPARKLINE ──
+function buildSparkline(data,w=80,h=24){
+  if(data.length<2) return '';
+  const min=Math.min(...data),max=Math.max(...data);
+  const range=max-min||1;
+  const step=w/(data.length-1);
+  const pts=data.map((v,i)=>`${(i*step).toFixed(1)},${(h-2-(v-min)/range*(h-4)).toFixed(1)}`);
+  const last=data[data.length-1];
+  const prev=data[data.length-2];
+  const color=last>=prev?'#4caf50':'#ff9800';
+  return `<svg class="sparkline" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+    <polyline points="${pts.join(' ')}" fill="none" stroke="${color}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="${((data.length-1)*step).toFixed(1)}" cy="${(h-2-(last-min)/range*(h-4)).toFixed(1)}" r="2.5" fill="${color}"/>
+  </svg><span style="font-size:10px;color:var(--text3);margin-left:4px">${min}–${max} lbs</span>`;
+}
+
 // ── LIFT ──
 const workoutA=['Squats','Overhead Press','Deadlift'];
 const workoutB=['Squats','Bench Press','Barbell Row'];
@@ -809,14 +846,18 @@ function renderLift(){
     if(allDone) return; // Exercise done — hide it
 
     const failCount=sets.filter(s=>s==='failed').length;
+    const hist=LS.get(`weight-hist-${key}`,[]).slice(-10);
     html+=`<div class="exercise-card" id="ex-${key}">`;
     html+=`<div class="exercise-header">
       <span class="exercise-name">${ex}</span>
       <div><input type="number" class="weight-input" value="${weight}"
         onchange="LS.set('weight-${key}',+this.value)" step="5">
       <span style="font-size:12px;color:var(--text3)">lbs</span></div>
-    </div>
-    <div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 sets × 5 reps${failCount?' · <span style="color:#ff9800">long-press = failed set</span>':' · hold to mark failed'}</div>
+    </div>`;
+    if(hist.length>=2){
+      html+=`<div style="margin-bottom:8px">${buildSparkline(hist.map(h=>h.weight),80,24)}</div>`;
+    }
+    html+=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 sets × 5 reps${failCount?' · <span style="color:#ff9800">long-press = failed set</span>':' · hold to mark failed'}</div>`;
     <div class="sets-row">`;
     for(let i=0;i<5;i++){
       const st=sets[i];
@@ -1211,8 +1252,12 @@ function addRehabRep(tab,id,max){
 }
 
 // ── HISTORY / HEATMAP ──
+let heatmapFilter=null; // null = show all
+
 function renderHistory(){
   renderStats();
+  renderWeeklySummary();
+  renderHeatmapLegend();
   renderHeatmap();
 }
 
@@ -1260,6 +1305,84 @@ function renderStats(){
     <div class="stat-card"><div class="val">${weekMin}</div><div class="lbl">Min This Week</div></div>
     <div class="stat-card"><div class="val" style="font-size:16px">${topAct}</div><div class="lbl">Top Activity</div></div>
   `;
+}
+
+function renderWeeklySummary(){
+  const now=new Date();
+  const dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const startOfWeek=new Date(now);
+  startOfWeek.setDate(now.getDate()-now.getDay());
+
+  let html='<h3>This Week</h3>';
+  let maxMin=1;
+  const days=[];
+  for(let i=0;i<7;i++){
+    const wd=new Date(startOfWeek);wd.setDate(startOfWeek.getDate()+i);
+    const ds=wd.toISOString().slice(0,10);
+    const acts=LS.get(`activities-${ds}`,[]);
+    let mins=0;
+    acts.forEach(a=>{if(a.duration) mins+=a.duration;});
+    const types=[...new Set(acts.map(a=>a.type))];
+    days.push({day:dayNames[i],mins,types,isToday:ds===today(),date:ds});
+    if(mins>maxMin) maxMin=mins;
+  }
+
+  days.forEach(d=>{
+    const pct=Math.max(4,d.mins/maxMin*100);
+    const typeDots=d.types.map(t=>{
+      const c={lift:'#e84545',swim:'#4a90d9',cycle:'#4caf50',walk:'#66bb6a',yoga:'#9c27b0',sauna:'#f5a623',stretch:'#ff9800',pullup:'#e0e0e0'}[t]||'#666';
+      return `<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${c}"></span>`;
+    }).join('');
+    html+=`<div class="week-row" style="${d.isToday?'background:#1e1e1e;border-radius:6px;padding:6px 8px':''}">
+      <span style="width:32px;font-size:12px;color:${d.isToday?'var(--text)':'var(--text3)'};font-weight:${d.isToday?'600':'400'}">${d.day}</span>
+      <div style="flex:1;margin:0 10px"><div class="week-bar" style="width:${pct}%"></div></div>
+      <span style="font-size:12px;color:var(--text2);width:50px;text-align:right">${d.mins?d.mins+' min':''}</span>
+      <span style="display:flex;gap:2px;margin-left:6px;min-width:40px">${typeDots}</span>
+    </div>`;
+  });
+
+  // Last 4 weeks comparison
+  html+='<div style="margin-top:12px;font-size:12px;color:var(--text3)">';
+  for(let w=0;w<4;w++){
+    const ws=new Date(startOfWeek);ws.setDate(ws.getDate()-w*7);
+    let wMin=0;
+    for(let i=0;i<7;i++){
+      const wd=new Date(ws);wd.setDate(ws.getDate()+i);
+      const ds=wd.toISOString().slice(0,10);
+      LS.get(`activities-${ds}`,[]).forEach(a=>{if(a.duration) wMin+=a.duration;});
+    }
+    const label=w===0?'This week':w===1?'Last week':`${w} weeks ago`;
+    html+=`<span style="display:inline-block;margin-right:12px">${label}: <strong style="color:var(--text)">${wMin} min</strong></span>`;
+  }
+  html+='</div>';
+
+  $('#weeklySummary').innerHTML=html;
+}
+
+function renderHeatmapLegend(){
+  const items=[
+    {type:'lift',label:'Lift',color:'#e84545'},
+    {type:'swim',label:'Swim',color:'#4a90d9'},
+    {type:'cycle',label:'Cycle',color:'#4caf50'},
+    {type:'walk',label:'Walk',color:'#66bb6a'},
+    {type:'yoga',label:'Yoga',color:'#9c27b0'},
+    {type:'stretch',label:'Stretch',color:'#ff9800'},
+    {type:'pullup',label:'Pull-ups',color:'#e0e0e0'},
+    {type:'sauna',label:'Sauna',color:'#f5a623'},
+  ];
+  let html=items.map(i=>
+    `<button class="legend-btn ${heatmapFilter===i.type?'active':''}" style="${heatmapFilter===i.type?'color:'+i.color+';border-color:'+i.color:''}" onclick="toggleHeatmapFilter('${i.type}')">
+      <span class="ldot" style="background:${i.color}"></span>${i.label}
+    </button>`
+  ).join('');
+  html+=`<button class="legend-btn ${heatmapFilter===null?'active':''}" onclick="toggleHeatmapFilter(null)">All</button>`;
+  $('#heatmapLegend').innerHTML=html;
+}
+
+function toggleHeatmapFilter(type){
+  heatmapFilter=heatmapFilter===type?null:type;
+  renderHeatmapLegend();
+  renderHeatmap();
 }
 
 function renderHeatmap(){
@@ -1321,7 +1444,8 @@ function renderHeatmap(){
         monthLabelHtml+=`<span style="min-width:${cellSize}px"></span>`;
       }
 
-      const acts=LS.get(`activities-${ds}`,[]);
+      let acts=LS.get(`activities-${ds}`,[]);
+      if(heatmapFilter) acts=acts.filter(a=>a.type===heatmapFilter);
       acts.forEach(a=>{if(a.duration) weekMin+=a.duration;});
 
       const cell=document.createElement('div');
