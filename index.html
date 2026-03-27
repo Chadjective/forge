@@ -498,6 +498,31 @@ function ding(count=1,vol=0.3){
   }
 }
 
+// ── EXERCISE DATA (must be before renderToday) ──
+const backStretches=[
+  {id:'hamstring',name:'Hamstring Stretch',cue:'Lying on back, lift one leg, keep spine neutral. Grab behind thigh or use a strap.',hold:30,sides:true,reps:3},
+  {id:'knee_chest',name:'Knee to Chest',cue:'Lying on back, bring one knee to chest. Keep spine neutral.',hold:30,sides:true,reps:3},
+  {id:'thread_needle',name:'Thread the Needle',cue:'Lying on back, cross one leg over opposite knee, pull thigh toward chest. Keep hips down.',hold:30,sides:true,reps:3},
+  {id:'spinal_twist',name:'Spinal Twist',cue:'Lying down, bend one knee, pull to opposite side. Reach upper body in opposite direction.',hold:30,sides:true,reps:3},
+  {id:'hip_flexor',name:'Lunge / Hip Flexor Stretch',cue:'Large step forward, neutral spine, tilt pelvis forward. Back knee bent or straight.',hold:30,sides:true,reps:3},
+  {id:'quad_stretch',name:'Quad Stretch',cue:'Standing, hold ankle, bring heel to buttock.',hold:30,sides:true,reps:3},
+  {id:'calf_stretch',name:'Calf Stretch',cue:'Against wall: alternate 10 sec straight leg / 10 sec bent leg.',hold:30,sides:true,reps:3}
+];
+const lowBackExercises=[
+  {id:'cat_camel',name:'Cat-Camel',cue:'Motion exercise, not a stretch. 5-8 cycles integrating full spine.',hold:0,sides:false,reps:8,isMotion:true},
+  {id:'curl_up',name:'Curl-up',cue:'Hands under lumbar, one knee bent. Raise head and upper shoulders only. 7-8 sec hold.',hold:8,sides:false,reps:5},
+  {id:'side_bridge',name:'Side Bridge',cue:'Elbow and knees (beginner) or elbow and feet (advanced). Neutral spine. 7-8 sec hold.',hold:8,sides:true,reps:5},
+  {id:'birddog',name:'Birddog',cue:'Alternate opposite arm and leg. Sweep floor between reps. 7-8 sec hold.',hold:8,sides:true,reps:5},
+  {id:'bridge',name:'Bridge',cue:'Activate glutes first, weight on heels. 30 sec to 1 min hold.',hold:30,sides:false,reps:5}
+];
+const neckExercises=[
+  {id:'chin_nod',name:'Chin Nod (Lying)',cue:'Small nodding movement toward toes. Don\'t lift head. Use deep neck muscles, not surface ones.',hold:5,sides:false,reps:10},
+  {id:'side_resist',name:'Side Resistance (Lying)',cue:'Hand on side of head, gentle resistance as if bending sideways. Hold.',hold:5,sides:true,reps:10},
+  {id:'prone_float',name:'Prone Head Float',cue:'Lying on tummy, hands under forehead. Nod and float head and breastbone off floor.',hold:5,sides:false,reps:10},
+  {id:'wall_slide',name:'Wall Slide (Standing)',cue:'Back to wall, feet slightly forward. Nod and slide base of skull up wall. Neck lengthens.',hold:5,sides:false,reps:10},
+  {id:'wall_float',name:'Wall Slide + Head Float',cue:'Same as wall slide, then move head away from wall toward floor, return. Don\'t let chin poke forward.',hold:5,sides:false,reps:10}
+];
+
 // ── NAVIGATION ──
 function showSection(id){
   $$('.section').forEach(s=>s.classList.remove('active'));
@@ -1106,32 +1131,6 @@ function saveActivity(type){
 // ── REHAB ──
 let currentRehabTab='back';
 let rehabTimers={};
-
-const backStretches=[
-  {id:'hamstring',name:'Hamstring Stretch',cue:'Lying on back, lift one leg, keep spine neutral. Grab behind thigh or use a strap.',hold:30,sides:true,reps:3},
-  {id:'knee_chest',name:'Knee to Chest',cue:'Lying on back, bring one knee to chest. Keep spine neutral.',hold:30,sides:true,reps:3},
-  {id:'thread_needle',name:'Thread the Needle',cue:'Lying on back, cross one leg over opposite knee, pull thigh toward chest. Keep hips down.',hold:30,sides:true,reps:3},
-  {id:'spinal_twist',name:'Spinal Twist',cue:'Lying down, bend one knee, pull to opposite side. Reach upper body in opposite direction.',hold:30,sides:true,reps:3},
-  {id:'hip_flexor',name:'Lunge / Hip Flexor Stretch',cue:'Large step forward, neutral spine, tilt pelvis forward. Back knee bent or straight.',hold:30,sides:true,reps:3},
-  {id:'quad_stretch',name:'Quad Stretch',cue:'Standing, hold ankle, bring heel to buttock.',hold:30,sides:true,reps:3},
-  {id:'calf_stretch',name:'Calf Stretch',cue:'Against wall: alternate 10 sec straight leg / 10 sec bent leg.',hold:30,sides:true,reps:3}
-];
-
-const lowBackExercises=[
-  {id:'cat_camel',name:'Cat-Camel',cue:'Motion exercise, not a stretch. 5-8 cycles integrating full spine.',hold:0,sides:false,reps:8,isMotion:true},
-  {id:'curl_up',name:'Curl-up',cue:'Hands under lumbar, one knee bent. Raise head and upper shoulders only. 7-8 sec hold.',hold:8,sides:false,reps:5},
-  {id:'side_bridge',name:'Side Bridge',cue:'Elbow and knees (beginner) or elbow and feet (advanced). Neutral spine. 7-8 sec hold.',hold:8,sides:true,reps:5},
-  {id:'birddog',name:'Birddog',cue:'Alternate opposite arm and leg. Sweep floor between reps. 7-8 sec hold.',hold:8,sides:true,reps:5},
-  {id:'bridge',name:'Bridge',cue:'Activate glutes first, weight on heels. 30 sec to 1 min hold.',hold:30,sides:false,reps:5}
-];
-
-const neckExercises=[
-  {id:'chin_nod',name:'Chin Nod (Lying)',cue:'Small nodding movement toward toes. Don\'t lift head. Use deep neck muscles, not surface ones.',hold:5,sides:false,reps:10},
-  {id:'side_resist',name:'Side Resistance (Lying)',cue:'Hand on side of head, gentle resistance as if bending sideways. Hold.',hold:5,sides:true,reps:10},
-  {id:'prone_float',name:'Prone Head Float',cue:'Lying on tummy, hands under forehead. Nod and float head and breastbone off floor.',hold:5,sides:false,reps:10},
-  {id:'wall_slide',name:'Wall Slide (Standing)',cue:'Back to wall, feet slightly forward. Nod and slide base of skull up wall. Neck lengthens.',hold:5,sides:false,reps:10},
-  {id:'wall_float',name:'Wall Slide + Head Float',cue:'Same as wall slide, then move head away from wall toward floor, return. Don\'t let chin poke forward.',hold:5,sides:false,reps:10}
-];
 
 function showRehab(tab){
   currentRehabTab=tab;
