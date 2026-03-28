@@ -20,6 +20,107 @@
 --accent-yoga:#9c27b0;--accent-sauna:#f5a623;--accent-stretch:#ff9800;
 --accent-pullup:#e0e0e0;--accent-walk:#66bb6a;
 --radius:12px;--radius-sm:8px;
+--set-radius:50%;
+}
+
+/* ── CHROME / METAL SKIN ── */
+body.skin-chrome{
+--bg:#181c20;--card:linear-gradient(145deg,#22272e,#1a1e24);
+--card-flat:#1e2228;--card2:#282e36;--card3:#2e343c;
+--text:#e0e4ea;--text2:#8899aa;--text3:#556677;
+--chrome-shine:linear-gradient(135deg,#3a4048 0%,#525a64 25%,#6a7480 50%,#525a64 75%,#3a4048 100%);
+--chrome-edge:linear-gradient(180deg,#555e68,#2a3038);
+--chrome-highlight:rgba(200,210,220,0.15);
+--chrome-shadow:rgba(0,0,0,0.5);
+--set-radius:8px;
+}
+body.skin-chrome .card,
+body.skin-chrome .exercise-card,
+body.skin-chrome .g-card,
+body.skin-chrome .stat-card{
+background:var(--card);border:1px solid #3a4250;
+box-shadow:0 3px 10px var(--chrome-shadow),inset 0 1px 0 var(--chrome-highlight);
+}
+body.skin-chrome nav{
+background:linear-gradient(180deg,#1e2228,#14181c);
+border-top:1px solid #3a4250;
+box-shadow:0 -2px 16px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,255,255,0.06);
+}
+body.skin-chrome .set-circle{
+border-radius:var(--set-radius);
+background:var(--chrome-shine);border:1px solid #666e78;
+color:#d0d8e0;font-weight:800;
+box-shadow:0 3px 8px var(--chrome-shadow),inset 0 1px 0 rgba(255,255,255,0.18),inset 0 -1px 0 rgba(0,0,0,0.2);
+text-shadow:0 1px 2px rgba(0,0,0,0.6);
+}
+body.skin-chrome .set-circle.done{
+background:linear-gradient(135deg,#b33030,#e84545,#ff6b6b,#e84545,#b33030);
+border-color:#ff6b6b;
+box-shadow:0 0 16px rgba(232,69,69,0.4),0 2px 6px var(--chrome-shadow),inset 0 1px 0 rgba(255,255,255,0.2);
+}
+body.skin-chrome .set-circle.partial{
+background:linear-gradient(135deg,#9a6600,#ff9800,#ffb74d,#ff9800,#9a6600);
+border-color:#ffb74d;
+box-shadow:0 0 12px rgba(255,152,0,0.3),0 2px 6px var(--chrome-shadow),inset 0 1px 0 rgba(255,255,255,0.2);
+}
+body.skin-chrome .bonus-circle{
+border-radius:var(--set-radius);
+background:var(--chrome-shine);border:1px solid #555e68;
+box-shadow:0 2px 6px var(--chrome-shadow),inset 0 1px 0 rgba(255,255,255,0.1);
+}
+body.skin-chrome .pullup-qc{
+border-radius:var(--set-radius);
+background:var(--chrome-shine);border:1px solid #555e68;
+box-shadow:0 2px 6px var(--chrome-shadow),inset 0 1px 0 rgba(255,255,255,0.1);
+}
+body.skin-chrome .btn{
+background:var(--chrome-shine);border:1px solid #555e68;
+box-shadow:0 2px 4px var(--chrome-shadow),inset 0 1px 0 rgba(255,255,255,0.08);
+color:#c0c8d0;text-shadow:0 1px 2px rgba(0,0,0,0.5);
+}
+body.skin-chrome .weight-input{
+background:var(--chrome-shine);border:1px solid #555e68;
+box-shadow:inset 0 2px 4px rgba(0,0,0,0.3),inset 0 -1px 0 rgba(255,255,255,0.05);
+color:#e0e4ea;
+}
+body.skin-chrome .exercise-header .exercise-name{
+background:linear-gradient(180deg,#d0d8e0,#8899aa);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+font-weight:700;
+}
+body.skin-chrome .quick-btn{
+background:var(--card);border:1px solid #333a44;
+box-shadow:0 2px 6px var(--chrome-shadow),inset 0 1px 0 var(--chrome-highlight);
+}
+body.skin-chrome h1{
+background:linear-gradient(180deg,#e0e8f0,#8899aa);
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+font-weight:800;letter-spacing:-0.5px;
+}
+body.skin-chrome .afterburn-btn{
+background:var(--card);border:1px solid #333a44;
+box-shadow:0 2px 6px var(--chrome-shadow),inset 0 1px 0 var(--chrome-highlight);
+}
+body.skin-chrome .toast{
+background:linear-gradient(135deg,#2a3038,#3a4248);
+border:1px solid #555e68;
+box-shadow:0 4px 16px rgba(0,0,0,0.5);
+}
+body.skin-chrome .garmin-import-btn{
+background:linear-gradient(135deg,#005a9e,#0078d4,#2196f3,#0078d4,#005a9e);
+border:1px solid #2196f3;
+box-shadow:0 2px 8px rgba(0,120,212,0.3),inset 0 1px 0 rgba(255,255,255,0.15);
+}
+/* Theme toggle button */
+.theme-toggle{
+position:fixed;top:8px;right:8px;z-index:150;
+background:var(--card2);border:1px solid #333;border-radius:20px;
+color:var(--text3);font-size:11px;padding:6px 12px;cursor:pointer;
+}
+@media(min-width:769px){.theme-toggle{top:68px;right:16px}}
+body.skin-chrome .theme-toggle{
+background:var(--chrome-shine);border:1px solid #555e68;
+box-shadow:0 2px 4px var(--chrome-shadow);color:#8899aa;
 }
 html{font-size:16px;-webkit-tap-highlight-color:transparent}
 body{
@@ -159,7 +260,7 @@ color:var(--text);padding:6px 8px;font-size:16px;text-align:center;
 }
 .sets-row{display:flex;gap:10px;justify-content:center;margin:12px 0}
 .set-circle{
-width:52px;height:52px;border-radius:50%;border:2px solid #444;
+width:52px;height:52px;border-radius:var(--set-radius,50%);border:2px solid #444;
 background:transparent;color:var(--text2);font-size:18px;font-weight:700;
 cursor:pointer;display:flex;align-items:center;justify-content:center;
 transition:all .25s;position:relative;
@@ -172,6 +273,20 @@ animation:setGlow 2s ease-out;
 }
 .set-circle.partial{background:#ff9800;border-color:#ff9800;color:#fff}
 .set-circle.failed{background:#555;border-color:#555;color:#999;font-size:14px}
+.bonus-circle{
+width:52px;height:52px;border-radius:var(--set-radius,50%);
+border:2px dashed #555;background:transparent;
+color:#777;font-size:24px;font-weight:300;
+cursor:pointer;display:flex;align-items:center;justify-content:center;
+transition:all .25s;position:relative;overflow:hidden;
+-webkit-user-select:none;user-select:none;
+}
+.bonus-circle:active{border-color:var(--accent-lift);color:var(--accent-lift)}
+.bonus-circle .bonus-fill-ring{
+position:absolute;inset:0;background:rgba(232,69,69,0.15);
+transform:scaleY(0);transform-origin:bottom;transition:transform .1s linear;
+border-radius:inherit;
+}
 @keyframes setGlow{
 0%{box-shadow:0 0 24px rgba(232,69,69,0.8);transform:scale(1.15)}
 100%{box-shadow:0 0 16px rgba(232,69,69,0.5);transform:scale(1)}
@@ -210,17 +325,8 @@ padding:12px;text-align:center;cursor:pointer;transition:.15s;
 .afterburn-btn.logged{border-color:#4caf50;background:rgba(76,175,80,0.1)}
 .afterburn-btn.logged .ab-name{color:#4caf50}
 
-/* BONUS SET */
-.bonus-set-btn{
-width:100%;padding:14px;margin-top:8px;border:2px dashed #444;border-radius:var(--radius);
-background:transparent;color:var(--text3);font-size:13px;font-weight:600;
-cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
-}
-.bonus-set-btn:active{border-color:var(--accent-lift);color:var(--accent-lift)}
-.bonus-fill{
-position:absolute;left:0;top:0;height:100%;background:rgba(232,69,69,0.2);
-transition:width .1s linear;pointer-events:none;
-}
+/* BONUS SET - now inline circle, old btn class kept for compat */
+.bonus-set-btn{display:none}
 
 /* REST TIMER - keep hidden, used for audio only */
 .rest-overlay{display:none}
@@ -492,6 +598,9 @@ background:rgba(0,120,212,0.2);color:#4a9eff;margin-left:6px;
 <div class="sheet-handle"></div>
 <div id="sheetContent"></div>
 </div>
+
+<!-- THEME TOGGLE -->
+<button class="theme-toggle" id="themeToggle" onclick="toggleSkin()">⚙️ Chrome</button>
 
 <!-- REST TIMER (hidden - inline timer used instead) -->
 <div class="rest-overlay hidden" id="restOverlay"></div>
@@ -1177,38 +1286,39 @@ function renderLift(){
     }
 
     html+=`<div class="sets-row">`;
-    for(let i=0;i<5;i++){
+    const setCount=sets.length;
+    for(let i=0;i<setCount;i++){
       const st=sets[i];
       let cls='', label='5';
       if(st==='done'||st===true){
         cls='done'; label='✓';
       } else if(typeof st==='number'){
-        // Partial/failed: number is reps completed (0-4)
         cls=st===0?'failed':'partial';
         label=st.toString();
       } else {
-        label='5'; // Target reps
+        label='5';
       }
       html+=`<button class="set-circle ${cls}"
         onclick="handleSetTap('${key}',${i})"
         data-key="${key}" data-idx="${i}">${label}</button>`;
     }
+    // Bonus + circle (always visible)
+    html+=`<button class="bonus-circle" id="bonus-${key}"
+      ontouchstart="startBonusHold('${key}')" ontouchend="cancelBonusHold()" ontouchmove="cancelBonusHold()"
+      onmousedown="startBonusHold('${key}')" onmouseup="cancelBonusHold()" onmouseleave="cancelBonusHold()">
+      <div class="bonus-fill-ring" id="bonus-fill-${key}"></div>
+      +</button>`;
     html+=`</div>`;
 
     // Status row
     if(allDone){
       const allSuccess=sets.every(s=>s==='done'||s===true);
+      const totalReps=sets.reduce((s,v)=>s+(v==='done'||v===true?5:(typeof v==='number'?v:0)),0);
       if(allSuccess){
-        html+=`<div style="text-align:center;font-size:12px;color:#4caf50;margin-top:4px">All 5×5 complete at ${weight} lbs — +5 lbs next session</div>`;
+        html+=`<div style="text-align:center;font-size:12px;color:#4caf50;margin-top:4px">All sets complete at ${weight} lbs — +5 lbs next session</div>`;
       } else {
-        const totalReps=sets.reduce((s,v)=>s+(v==='done'||v===true?5:(typeof v==='number'?v:0)),0);
-        html+=`<div style="text-align:center;font-size:12px;color:#ff9800;margin-top:4px">${totalReps}/25 reps — keep at ${weight} lbs next session</div>`;
+        html+=`<div style="text-align:center;font-size:12px;color:#ff9800;margin-top:4px">${totalReps}/${setCount*5} reps — keep at ${weight} lbs next session</div>`;
       }
-      // Bonus set option
-      html+=`<button class="bonus-set-btn" ontouchstart="startBonusHold('${key}')" ontouchend="cancelBonusHold()" ontouchmove="cancelBonusHold()" onmousedown="startBonusHold('${key}')" onmouseup="cancelBonusHold()">
-        <div class="bonus-fill" id="bonus-fill-${key}"></div>
-        Hold for bonus set 💥
-      </button>`;
     } else {
       html+=`<div style="text-align:center;font-size:11px;color:var(--text3);margin-top:4px">tap = done · double-tap = count down reps</div>`;
     }
@@ -1390,14 +1500,13 @@ const BONUS_HOLD_MS=1500;
 function startBonusHold(key){
   bonusStartTime=Date.now();
   const fillEl=$(`#bonus-fill-${key}`);
-  if(fillEl) fillEl.style.width='0%';
+  if(fillEl) fillEl.style.transform='scaleY(0)';
 
   function animate(){
     const elapsed=Date.now()-bonusStartTime;
-    const pct=Math.min(100,elapsed/BONUS_HOLD_MS*100);
-    if(fillEl) fillEl.style.width=pct+'%';
+    const pct=Math.min(1,elapsed/BONUS_HOLD_MS);
+    if(fillEl) fillEl.style.transform=`scaleY(${pct})`;
     if(elapsed>=BONUS_HOLD_MS){
-      // Trigger bonus set!
       haptic(100);
       addBonusSet(key);
       return;
@@ -1409,8 +1518,7 @@ function startBonusHold(key){
 
 function cancelBonusHold(){
   if(bonusAnimFrame) cancelAnimationFrame(bonusAnimFrame);
-  // Reset all fills
-  $$('.bonus-fill').forEach(f=>f.style.width='0%');
+  $$('.bonus-fill-ring').forEach(f=>f.style.transform='scaleY(0)');
 }
 
 function addBonusSet(key){
@@ -3180,6 +3288,27 @@ const origRenderHistory=typeof renderHistory==='function'?renderHistory:null;
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
+
+// ── SKIN / THEME ──
+function toggleSkin(){
+  const isChrome=document.body.classList.toggle('skin-chrome');
+  LS.set('forge-skin',isChrome?'chrome':'default');
+  updateSkinButton();
+}
+
+function updateSkinButton(){
+  const btn=$('#themeToggle');
+  if(!btn) return;
+  const isChrome=document.body.classList.contains('skin-chrome');
+  btn.textContent=isChrome?'⚙️ Classic':'⚙️ Chrome';
+}
+
+function applySavedSkin(){
+  const skin=LS.get('forge-skin','default');
+  if(skin==='chrome') document.body.classList.add('skin-chrome');
+  updateSkinButton();
+}
+applySavedSkin();
 
 // ── INIT ──
 try{
