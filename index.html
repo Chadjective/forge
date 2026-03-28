@@ -10,6 +10,7 @@
 <meta name="apple-mobile-web-app-title" content="Forge">
 <meta name="theme-color" content="#0d0d0d">
 <link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -311,6 +312,109 @@ color:var(--text2);font-size:11px;cursor:pointer;transition:.15s;
 /* DATA MANAGEMENT */
 .data-actions{display:flex;gap:8px;margin-top:16px}
 .data-actions .btn{flex:1;font-size:13px}
+
+/* GARMIN DASHBOARD */
+.garmin-section{margin-top:24px}
+.garmin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.garmin-header h2{font-size:20px;font-weight:700;display:flex;align-items:center;gap:8px}
+.garmin-import-btn{
+background:#0078d4;color:#fff;border:none;border-radius:var(--radius-sm);
+padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;
+}
+.garmin-import-btn:active{transform:scale(.96)}
+.garmin-tabs{display:flex;gap:4px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
+.garmin-tab{
+padding:8px 14px;border-radius:20px;border:none;background:var(--card);
+color:var(--text2);font-size:13px;cursor:pointer;white-space:nowrap;transition:.15s;min-height:36px;
+}
+.garmin-tab.active{background:#0078d4;color:#fff}
+.garmin-empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.garmin-empty .icon{font-size:48px;margin-bottom:12px}
+.garmin-empty p{font-size:13px;line-height:1.6;max-width:320px;margin:0 auto}
+
+/* Garmin Chart Cards */
+.g-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.g-card h4{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.g-card h4 .g-icon{font-size:18px}
+.g-card .g-value{font-size:28px;font-weight:700;margin-bottom:2px}
+.g-card .g-label{font-size:11px;color:var(--text3)}
+.g-card .g-sub{font-size:12px;color:var(--text2);margin-top:4px}
+.g-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.g-stat{background:var(--card2);border-radius:var(--radius-sm);padding:10px;text-align:center}
+.g-stat .val{font-size:20px;font-weight:700}
+.g-stat .lbl{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* SVG Charts */
+.g-chart-wrap{width:100%;overflow-x:auto;margin:8px 0}
+.g-chart{display:block;width:100%;height:auto}
+.g-chart text{font-family:-apple-system,BlinkMacSystemFont,sans-serif}
+
+/* Sleep bars */
+.g-sleep-bar{display:flex;height:24px;border-radius:6px;overflow:hidden;margin:4px 0}
+.g-sleep-bar div{height:100%;transition:width .3s}
+
+/* Activity list */
+.g-activity-item{
+display:flex;align-items:center;gap:12px;padding:10px 0;
+border-bottom:1px solid #1e1e1e;
+}
+.g-activity-item:last-child{border-bottom:none}
+.g-activity-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;
+justify-content:center;font-size:16px;flex-shrink:0}
+.g-activity-info{flex:1;min-width:0}
+.g-activity-name{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g-activity-detail{font-size:12px;color:var(--text2)}
+.g-activity-val{text-align:right;flex-shrink:0}
+.g-activity-val .num{font-size:16px;font-weight:700}
+.g-activity-val .unit{font-size:11px;color:var(--text3)}
+
+/* Period selector */
+.g-period{display:flex;gap:4px;margin-bottom:12px}
+.g-period button{
+padding:6px 12px;border-radius:16px;border:none;background:var(--card2);
+color:var(--text2);font-size:12px;cursor:pointer;transition:.15s;
+}
+.g-period button.active{background:#0078d4;color:#fff}
+
+/* Garmin range selector */
+.g-range-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:13px;color:var(--text2)}
+.g-range-row button{
+background:var(--card2);border:none;color:var(--text);border-radius:var(--radius-sm);
+padding:6px 10px;cursor:pointer;font-size:14px;
+}
+
+/* Recovery alerts */
+.g-alert-card{border-left:3px solid #ff9800}
+
+/* Personal records */
+.pr-badge{
+display:inline-flex;align-items:center;gap:4px;padding:3px 8px;
+border-radius:12px;font-size:10px;font-weight:700;
+background:rgba(255,215,0,0.15);color:#ffd700;
+}
+
+/* Body weight */
+.bw-input-row{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+.bw-input{
+width:100px;background:var(--card2);border:1px solid #333;border-radius:var(--radius-sm);
+color:var(--text);padding:8px 10px;font-size:16px;text-align:center;
+}
+
+/* Journal */
+.journal-textarea{
+width:100%;background:var(--card2);border:1px solid #333;border-radius:var(--radius-sm);
+color:var(--text);padding:10px 12px;font-size:14px;line-height:1.5;
+resize:vertical;min-height:80px;font-family:inherit;
+}
+.journal-textarea:focus{outline:none;border-color:#555}
+.journal-saved{font-size:11px;color:var(--text3);margin-top:4px}
+
+/* Garmin badge */
+.garmin-badge{
+display:inline-flex;align-items:center;gap:3px;padding:2px 6px;
+border-radius:8px;font-size:9px;font-weight:600;
+background:rgba(0,120,212,0.2);color:#4a9eff;margin-left:6px;
+}
 </style>
 </head>
 <body>
@@ -406,6 +510,21 @@ color:var(--text2);font-size:11px;cursor:pointer;transition:.15s;
 </div>
 
 <div class="card">
+<h3 style="display:flex;align-items:center;gap:8px">⚖️ Body Weight</h3>
+<div class="bw-input-row">
+<input type="number" class="bw-input" id="bwInput" placeholder="lbs" step="0.1" onchange="saveBodyWeight()">
+<span style="font-size:13px;color:var(--text2)" id="bwTrend"></span>
+</div>
+<div id="bwSparkline"></div>
+</div>
+
+<div class="card">
+<h3 style="display:flex;align-items:center;gap:8px">📝 Journal</h3>
+<textarea class="journal-textarea" id="journalText" placeholder="How are you feeling today? Energy, mood, notes..." oninput="saveJournal()"></textarea>
+<div class="journal-saved" id="journalSaved"></div>
+</div>
+
+<div class="card">
 <h3>Today's Activity</h3>
 <div class="today-pills" id="todayPills"></div>
 </div>
@@ -450,6 +569,12 @@ color:var(--text2);font-size:11px;cursor:pointer;transition:.15s;
 <h1>History</h1>
 <div class="stats-grid" id="statsGrid"></div>
 
+<div class="card" id="monthlyReport"></div>
+
+<div class="card" id="personalRecords"></div>
+
+<div class="card" id="volumeTrends"></div>
+
 <div class="card" id="weeklySummary"></div>
 
 <h3 style="margin-top:16px">Activity Heatmap — Last 6 Months</h3>
@@ -461,6 +586,52 @@ color:var(--text2);font-size:11px;cursor:pointer;transition:.15s;
 <div class="heatmap" id="heatmap"></div>
 </div>
 </div>
+<!-- GARMIN DASHBOARD -->
+<div class="garmin-section" id="garminSection">
+<div class="garmin-header">
+<h2>⌚ Garmin</h2>
+<button class="garmin-import-btn" onclick="document.getElementById('garminImport').click()">Import Garmin Data</button>
+<input type="file" id="garminImport" accept=".json,.zip" multiple style="display:none" onchange="handleGarminImport(event)">
+</div>
+
+<div id="garminEmpty" class="garmin-empty">
+<div class="icon">⌚</div>
+<p><strong>No Garmin data yet</strong><br><br>
+Export your data from <strong>Garmin Connect</strong> → Account Settings → Request Your Data.<br><br>
+Then import the JSON files or ZIP archive here to see your heart rate, sleep, stress, body battery, and activity history.</p>
+</div>
+
+<div id="garminDash" style="display:none">
+<div class="garmin-tabs" id="garminTabs">
+<button class="garmin-tab active" onclick="showGarminTab('overview')">Overview</button>
+<button class="garmin-tab" onclick="showGarminTab('heart')">Heart Rate</button>
+<button class="garmin-tab" onclick="showGarminTab('sleep')">Sleep</button>
+<button class="garmin-tab" onclick="showGarminTab('stress')">Stress</button>
+<button class="garmin-tab" onclick="showGarminTab('steps')">Steps</button>
+<button class="garmin-tab" onclick="showGarminTab('activities')">Activities</button>
+</div>
+
+<div class="g-period" id="garminPeriod">
+<button class="active" onclick="setGarminPeriod(7)">7D</button>
+<button onclick="setGarminPeriod(30)">30D</button>
+<button onclick="setGarminPeriod(90)">90D</button>
+<button onclick="setGarminPeriod(365)">1Y</button>
+<button onclick="setGarminPeriod(0)">All</button>
+</div>
+
+<div id="garminContent"></div>
+
+<div class="g-card" style="margin-top:16px">
+<h4>Manage Garmin Data</h4>
+<div class="data-actions">
+<button class="btn" onclick="document.getElementById('garminImport').click()">📥 Import More</button>
+<button class="btn" onclick="clearGarminData()">🗑️ Clear Garmin Data</button>
+</div>
+<p style="font-size:11px;color:var(--text3);margin-top:8px" id="garminMeta"></p>
+</div>
+</div>
+</div>
+
 <div class="card">
 <h3>Data Management</h3>
 <p style="font-size:12px;color:var(--text2);margin-bottom:8px">Export your data to back up or sync between devices.</p>
@@ -547,6 +718,8 @@ function renderToday(){
   renderPullups();
   renderTodayStretch();
   renderTodayPills();
+  initBodyWeight();
+  initJournal();
 }
 
 function renderTodayStretch(){
@@ -633,6 +806,7 @@ function quickPullup(reps){
   logActivity('pullup',{reps,sets:sets.length,totalReps:sets.reduce((a,b)=>a+b,0)});
   renderPullups();
   renderTodayPills();
+  haptic(50);
   showToast(`Pull-ups: ${reps} reps logged`);
 }
 
@@ -641,6 +815,7 @@ function showToast(msg,duration=2500){
   const t=$('#toast');
   t.textContent=msg;
   t.classList.add('show');
+  haptic(20);
   setTimeout(()=>t.classList.remove('show'),duration);
 }
 
@@ -750,10 +925,16 @@ function importData(event){
 function renderTodayPills(){
   const acts=LS.get(`activities-${today()}`,[]);
   const c=$('#todayPills');
-  if(!acts.length){c.innerHTML='<span class="empty">Nothing logged yet</span>';return;}
+
+  // Merge Garmin activities for today
+  const garminData=getGarminData();
+  const garminToday=garminData.activities.filter(a=>a.date===today());
+
+  if(!acts.length&&!garminToday.length){c.innerHTML='<span class="empty">Nothing logged yet</span>';return;}
+
   const colors={lift:'#e84545',swim:'#4a90d9',cycle:'#4caf50',
     walk:'#66bb6a',yoga:'#9c27b0',sauna:'#f5a623',
-    pullup:'#e0e0e0',stretch:'#ff9800'};
+    pullup:'#e0e0e0',stretch:'#ff9800',garmin:'#0078d4'};
   const icons={lift:'🏋️',swim:'🏊',cycle:'🚴',walk:'🚶',yoga:'🧘',sauna:'🧖',pullup:'💪',stretch:'🧘‍♂️'};
   const names={lift:'Lifting',swim:'Swimming',cycle:'Cycling',walk:'Walking',
     yoga:'Yoga',sauna:'Sauna',pullup:'Pull-ups',stretch:'Stretching'};
@@ -770,6 +951,23 @@ function renderTodayPills(){
     }
   });
 
+  // Add Garmin activities as separate timeline entries
+  garminToday.forEach(ga=>{
+    const ts=ga.startTime?new Date(ga.startTime).getTime():(Date.now());
+    timeline.push({
+      type:'garmin',
+      garminType:ga.type,
+      entries:[ga],
+      firstTs:ts,
+      lastTs:ts,
+      isGarmin:true,
+      garminActivity:ga
+    });
+  });
+
+  // Sort by timestamp
+  timeline.sort((a,b)=>a.firstTs-b.firstTs);
+
   function fmtTime(ts){
     const d=new Date(ts);
     let h=d.getHours(), m=d.getMinutes(), ap=h>=12?'pm':'am';
@@ -780,7 +978,18 @@ function renderTodayPills(){
   let html='';
   timeline.forEach(t=>{
     let detail='';
-    if(t.type==='pullup'){
+    let badge='';
+
+    if(t.isGarmin){
+      const ga=t.garminActivity;
+      const dur=ga.duration>=3600?`${(ga.duration/3600).toFixed(1)}h`:`${Math.round(ga.duration/60)}m`;
+      const parts=[dur];
+      if(ga.distance>0) parts.push(`${(ga.distance/1000).toFixed(1)}km`);
+      if(ga.avgHR>0) parts.push(`❤️ ${ga.avgHR}`);
+      if(ga.calories>0) parts.push(`${ga.calories} cal`);
+      detail=parts.join(' · ');
+      badge='<span class="garmin-badge">⌚ Garmin</span>';
+    } else if(t.type==='pullup'){
       const total=t.entries.reduce((s,e)=>s+(e.reps||e.totalReps||0),0);
       const sets=t.entries.length;
       detail=`${total} reps across ${sets} set${sets>1?'s':''}`;
@@ -810,18 +1019,23 @@ function renderTodayPills(){
       detail=parts.join(' · ');
     }
 
-    const bg=colors[t.type]||'#444';
+    const icon=t.isGarmin?garminActivityIcon(t.garminType):(icons[t.type]||'•');
+    const name=t.isGarmin?(t.garminActivity.name||t.garminType||'Activity'):(names[t.type]||t.type);
+    const bg=t.isGarmin?'#0078d4':(colors[t.type]||'#444');
+    const textColor=t.type==='pullup'?';color:#111':';color:#fff';
     const timeStr=fmtTime(t.firstTs);
+    const deleteBtn=t.isGarmin?'':`<button class="tl-delete" onclick="deleteActivity('${t.type}',${t.firstTs})" title="Remove">✕</button>`;
+
     html+=`<div class="tl-item">
       <div class="tl-track">
-        <div class="tl-dot" style="background:${bg}${t.type==='pullup'?';color:#111':';color:#fff'}">${icons[t.type]||'•'}</div>
+        <div class="tl-dot" style="background:${bg}${textColor}">${icon}</div>
         <div class="tl-line"></div>
       </div>
       <div class="tl-body">
-        <div class="tl-name">${names[t.type]||t.type}</div>
+        <div class="tl-name">${name}${badge}</div>
         ${detail?`<div class="tl-detail">${detail}</div>`:''}
         <div class="tl-time">${timeStr}</div>
-        <button class="tl-delete" onclick="deleteActivity('${t.type}',${t.firstTs})" title="Remove">✕</button>
+        ${deleteBtn}
       </div>
     </div>`;
   });
@@ -911,7 +1125,7 @@ function renderLift(){
     if(hist.length>=2){
       html+=`<div style="margin-bottom:8px">${buildSparkline(hist.map(h=>h.weight),80,24)}</div>`;
     }
-    html+=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 sets × 5 reps${failCount?' · <span style="color:#ff9800">long-press = failed set</span>':' · hold to mark failed'}</div>`;
+    html+=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 sets × 5 reps${failCount?' · <span style="color:#ff9800">long-press = failed set</span>':' · hold to mark failed'}</div>
     <div class="sets-row">`;
     for(let i=0;i<5;i++){
       const st=sets[i];
@@ -983,6 +1197,7 @@ function completeSet(key,idx){
   todaySets[key][idx]='done';
   LS.set(`lift-${today()}`,todaySets);
   logActivity('lift',{exercise:key,set:idx+1});
+  haptic(50);
   renderLift();
   startRest();
 }
@@ -1284,6 +1499,9 @@ let heatmapFilter=null; // null = show all
 
 function renderHistory(){
   renderStats();
+  renderMonthlyReport();
+  renderPersonalRecords();
+  renderVolumeTrends();
   renderWeeklySummary();
   renderHeatmapLegend();
   renderHeatmap();
@@ -1544,6 +1762,20 @@ function showDayPopup(ds){
       pullups.forEach((r,i)=>{html+=`<span class="tag">Set ${i+1}: ${r} reps</span><br>`;});
       html+=`</div>`;
     }
+
+    // Journal
+    const journal=LS.get(`journal-${ds}`,'');
+    if(journal){
+      html+=`<div style="margin-bottom:8px"><strong>📝 Journal</strong><br>
+        <span style="font-size:13px;color:var(--text2);white-space:pre-wrap">${journal}</span></div>`;
+    }
+
+    // Body weight
+    const bwHist=LS.get('bodyweight-hist',[]);
+    const bwEntry=bwHist.find(h=>h.date===ds);
+    if(bwEntry){
+      html+=`<div style="margin-bottom:8px"><strong>⚖️ Weight</strong> ${bwEntry.weight} lbs</div>`;
+    }
   }
   html+=`<button class="btn" style="width:100%;margin-top:12px" onclick="closeDayPopup()">Close</button>`;
   popup.innerHTML=html;
@@ -1555,6 +1787,1178 @@ function closeDayPopup(){
   $('#dayPopup').style.display='none';
   $('#dayPopupOverlay').style.display='none';
 }
+
+// ── BODY WEIGHT TRACKING ──
+function initBodyWeight(){
+  const hist=LS.get('bodyweight-hist',[]);
+  const todayEntry=hist.find(h=>h.date===today());
+  const input=$('#bwInput');
+  if(input&&todayEntry) input.value=todayEntry.weight;
+  renderBodyWeightTrend();
+}
+
+function saveBodyWeight(){
+  const val=parseFloat($('#bwInput')?.value);
+  if(!val||val<50||val>500) return;
+  const hist=LS.get('bodyweight-hist',[]);
+  const idx=hist.findIndex(h=>h.date===today());
+  if(idx>=0) hist[idx].weight=val;
+  else hist.push({date:today(),weight:val});
+  hist.sort((a,b)=>a.date.localeCompare(b.date));
+  LS.set('bodyweight-hist',hist);
+  renderBodyWeightTrend();
+  if(navigator.vibrate) navigator.vibrate(30);
+}
+
+function renderBodyWeightTrend(){
+  const hist=LS.get('bodyweight-hist',[]);
+  const trend=$('#bwTrend');
+  const spark=$('#bwSparkline');
+  if(!trend||!spark) return;
+  if(hist.length<2){
+    trend.textContent=hist.length?`${hist[hist.length-1].weight} lbs`:'';
+    spark.innerHTML='';
+    return;
+  }
+  const last=hist[hist.length-1].weight;
+  const prev=hist[hist.length-2].weight;
+  const diff=(last-prev).toFixed(1);
+  const arrow=diff>0?'↑':diff<0?'↓':'→';
+  const color=diff>0?'#ff9800':diff<0?'#4caf50':'var(--text2)';
+  trend.innerHTML=`<span style="color:${color}">${arrow} ${Math.abs(diff)} lbs</span> from ${prev}`;
+
+  const recent=hist.slice(-20);
+  spark.innerHTML=buildSparkline(recent.map(h=>h.weight),200,32);
+}
+
+// ── JOURNAL ──
+function initJournal(){
+  const entry=LS.get(`journal-${today()}`,'');
+  const ta=$('#journalText');
+  if(ta) ta.value=entry;
+  const saved=$('#journalSaved');
+  if(saved&&entry) saved.textContent='Saved';
+}
+
+let journalTimer=null;
+function saveJournal(){
+  clearTimeout(journalTimer);
+  journalTimer=setTimeout(()=>{
+    const val=$('#journalText')?.value||'';
+    LS.set(`journal-${today()}`,val);
+    const saved=$('#journalSaved');
+    if(saved) saved.textContent=val?'Saved':'';
+  },500);
+}
+
+// ── PERSONAL RECORDS ──
+function renderPersonalRecords(){
+  const el=$('#personalRecords');
+  if(!el) return;
+
+  const records=[];
+
+  // Lift PRs
+  const exercises={squats:'Squats',bench_press:'Bench Press',barbell_row:'Barbell Row',
+    overhead_press:'Overhead Press',deadlift:'Deadlift'};
+  Object.entries(exercises).forEach(([key,name])=>{
+    const hist=LS.get(`weight-hist-${key}`,[]);
+    if(hist.length){
+      const max=hist.reduce((a,b)=>b.weight>a.weight?b:a);
+      records.push({type:'lift',name,value:`${max.weight} lbs`,date:max.date,icon:'🏋️'});
+    }
+  });
+
+  // Activity PRs from logs
+  ['swim','cycle','walk','yoga','sauna'].forEach(type=>{
+    const log=LS.get(`log-${type}`,[]);
+    if(log.length){
+      // Longest duration
+      const longest=log.reduce((a,b)=>(b.duration||0)>(a.duration||0)?b:a);
+      if(longest.duration){
+        const names={swim:'Swimming',cycle:'Cycling',walk:'Walking',yoga:'Yoga',sauna:'Sauna'};
+        const icons={swim:'🏊',cycle:'🚴',walk:'🚶',yoga:'🧘',sauna:'🧖'};
+        records.push({type,name:`Longest ${names[type]}`,value:`${longest.duration} min`,date:longest.date,icon:icons[type]});
+      }
+      // Farthest distance
+      if(log.some(l=>l.distance)){
+        const farthest=log.reduce((a,b)=>(b.distance||0)>(a.distance||0)?b:a);
+        if(farthest.distance){
+          const names={swim:'Swim',cycle:'Ride',walk:'Walk'};
+          records.push({type,name:`Farthest ${names[type]||type}`,value:`${farthest.distance} ${type==='swim'?'m':'km'}`,date:farthest.date,icon:'📏'});
+        }
+      }
+    }
+  });
+
+  // Pull-up PR
+  const allDates=LS.get('activity-dates',[]);
+  let maxPullups=0, maxPullupDate='';
+  allDates.forEach(ds=>{
+    const sets=LS.get(`pullups-${ds}`,[]);
+    const total=sets.reduce((a,b)=>a+b,0);
+    if(total>maxPullups){maxPullups=total;maxPullupDate=ds;}
+  });
+  if(maxPullups>0) records.push({type:'pullup',name:'Most Pull-ups (day)',value:`${maxPullups} reps`,date:maxPullupDate,icon:'💪'});
+
+  // Single set PR
+  let maxSet=0, maxSetDate='';
+  allDates.forEach(ds=>{
+    const sets=LS.get(`pullups-${ds}`,[]);
+    sets.forEach(s=>{if(s>maxSet){maxSet=s;maxSetDate=ds;}});
+  });
+  if(maxSet>0) records.push({type:'pullup',name:'Best Pull-up Set',value:`${maxSet} reps`,date:maxSetDate,icon:'🔥'});
+
+  // Garmin PRs
+  const garmin=getGarminData();
+  if(garmin.activities.length){
+    const runs=garmin.activities.filter(a=>['running','trail_running','treadmill_running'].includes(a.type));
+    if(runs.length){
+      const longest=runs.reduce((a,b)=>b.distance>a.distance?b:a);
+      if(longest.distance>0) records.push({name:'Longest Run',value:`${(longest.distance/1000).toFixed(1)}km`,date:longest.date,icon:'🏃'});
+    }
+    const rides=garmin.activities.filter(a=>['cycling','road_biking','mountain_biking','indoor_cycling'].includes(a.type));
+    if(rides.length){
+      const longest=rides.reduce((a,b)=>b.distance>a.distance?b:a);
+      if(longest.distance>0) records.push({name:'Longest Ride',value:`${(longest.distance/1000).toFixed(1)}km`,date:longest.date,icon:'🚴'});
+    }
+    const swims=garmin.activities.filter(a=>['swimming','lap_swimming','open_water_swimming','pool_swimming'].includes(a.type));
+    if(swims.length){
+      const longest=swims.reduce((a,b)=>b.duration>a.duration?b:a);
+      if(longest.duration>0) records.push({name:'Longest Swim',value:`${Math.round(longest.duration/60)}min`,date:longest.date,icon:'🏊'});
+    }
+  }
+
+  if(!records.length){el.style.display='none';return;}
+  el.style.display='';
+  let html=`<h3 style="display:flex;align-items:center;gap:8px">🏆 Personal Records</h3>
+    <div style="margin-top:12px">`;
+  records.forEach(r=>{
+    html+=`<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #1e1e1e">
+      <span style="font-size:18px">${r.icon}</span>
+      <span style="flex:1;font-size:13px">${r.name}</span>
+      <span class="pr-badge">${r.value}</span>
+      <span style="font-size:11px;color:var(--text3)">${r.date||''}</span>
+    </div>`;
+  });
+  html+=`</div>`;
+  el.innerHTML=html;
+}
+
+// ── MONTHLY PROGRESS REPORT ──
+function renderMonthlyReport(){
+  const el=$('#monthlyReport');
+  if(!el) return;
+
+  const now=new Date();
+  const monthStart=new Date(now.getFullYear(),now.getMonth(),1);
+  const monthName=monthStart.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const daysInMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+  const dayOfMonth=now.getDate();
+
+  // Gather month data
+  let totalActivities=0, totalMinutes=0, activeDays=new Set();
+  const typeCounts={};
+  for(let d=1;d<=dayOfMonth;d++){
+    const ds=new Date(now.getFullYear(),now.getMonth(),d).toISOString().slice(0,10);
+    const acts=LS.get(`activities-${ds}`,[]);
+    if(acts.length){
+      activeDays.add(ds);
+      acts.forEach(a=>{
+        totalActivities++;
+        if(a.duration) totalMinutes+=a.duration;
+        typeCounts[a.type]=(typeCounts[a.type]||0)+1;
+      });
+    }
+  }
+
+  // Pull-ups this month
+  let monthPullups=0;
+  for(let d=1;d<=dayOfMonth;d++){
+    const ds=new Date(now.getFullYear(),now.getMonth(),d).toISOString().slice(0,10);
+    const sets=LS.get(`pullups-${ds}`,[]);
+    monthPullups+=sets.reduce((a,b)=>a+b,0);
+  }
+
+  // Body weight change
+  const bwHist=LS.get('bodyweight-hist',[]);
+  const monthBW=bwHist.filter(h=>h.date>=monthStart.toISOString().slice(0,10));
+  let bwChange='';
+  if(monthBW.length>=2){
+    const diff=(monthBW[monthBW.length-1].weight-monthBW[0].weight).toFixed(1);
+    const arrow=diff>0?'↑':diff<0?'↓':'→';
+    bwChange=`<span style="color:${diff>0?'#ff9800':diff<0?'#4caf50':'var(--text2)'}">${arrow}${Math.abs(diff)} lbs</span>`;
+  }
+
+  const consistency=Math.round(activeDays.size/dayOfMonth*100);
+  const topType=Object.entries(typeCounts).sort((a,b)=>b[1]-a[1])[0];
+
+  let html=`<h3 style="display:flex;align-items:center;gap:8px">📊 ${monthName}</h3>
+    <div class="g-stats-row" style="margin-top:12px">
+      <div class="g-stat"><div class="val" style="color:#4caf50">${activeDays.size}/${dayOfMonth}</div><div class="lbl">Active Days</div></div>
+      <div class="g-stat"><div class="val">${consistency}%</div><div class="lbl">Consistency</div></div>
+      <div class="g-stat"><div class="val">${totalMinutes}m</div><div class="lbl">Total Minutes</div></div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12px;color:var(--text2)">`;
+  if(monthPullups) html+=`<span>💪 ${monthPullups} pull-up reps</span>`;
+  if(topType) html+=`<span>🏆 Top: ${topType[0]} (${topType[1]}x)</span>`;
+  if(bwChange) html+=`<span>⚖️ Weight: ${bwChange}</span>`;
+  html+=`</div>`;
+
+  // Progress bar for month
+  const pct=Math.round(dayOfMonth/daysInMonth*100);
+  html+=`<div style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:4px">
+      <span>Month progress</span><span>${pct}%</span>
+    </div>
+    <div style="height:6px;background:var(--card2);border-radius:3px;overflow:hidden">
+      <div style="width:${pct}%;height:100%;background:#4caf50;border-radius:3px"></div>
+    </div>
+  </div>`;
+
+  el.innerHTML=html;
+}
+
+// ── VOLUME TRENDS ──
+function renderVolumeTrends(){
+  const el=$('#volumeTrends');
+  if(!el) return;
+
+  // Gather 8 weeks of data
+  const weeks=[];
+  const now=new Date();
+  for(let w=7;w>=0;w--){
+    const weekStart=new Date(now);
+    weekStart.setDate(now.getDate()-now.getDay()-(w*7));
+    let sets=0, reps=0, minutes=0, activities=0;
+    for(let d=0;d<7;d++){
+      const day=new Date(weekStart);
+      day.setDate(weekStart.getDate()+d);
+      const ds=day.toISOString().slice(0,10);
+      // Lift sets
+      const liftData=LS.get(`lift-${ds}`,{});
+      Object.values(liftData).forEach(ex=>{
+        if(Array.isArray(ex)) ex.forEach(s=>{if(s) sets++;});
+      });
+      // Pull-up reps
+      const pullups=LS.get(`pullups-${ds}`,[]);
+      reps+=pullups.reduce((a,b)=>a+b,0);
+      // Activity minutes
+      const acts=LS.get(`activities-${ds}`,[]);
+      acts.forEach(a=>{
+        activities++;
+        if(a.duration) minutes+=a.duration;
+      });
+    }
+    const label=`${(weekStart.getMonth()+1)}/${weekStart.getDate()}`;
+    weeks.push({label,sets,reps,minutes,activities});
+  }
+
+  if(weeks.every(w=>w.sets===0&&w.reps===0&&w.minutes===0)){
+    el.style.display='none';
+    return;
+  }
+  el.style.display='';
+
+  let html=`<h3 style="display:flex;align-items:center;gap:8px">📈 Volume Trends (8 Weeks)</h3>`;
+
+  // Lift sets chart
+  if(weeks.some(w=>w.sets>0)){
+    html+=`<div style="margin-top:12px"><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Lift Sets / Week</div>`;
+    html+=buildBarChart(weeks.map(w=>({y:w.sets,label:w.label})),320,100,'#e84545',{label:''});
+    html+=`</div>`;
+  }
+
+  // Pull-up reps chart
+  if(weeks.some(w=>w.reps>0)){
+    html+=`<div style="margin-top:12px"><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Pull-up Reps / Week</div>`;
+    html+=buildBarChart(weeks.map(w=>({y:w.reps,label:w.label})),320,100,'#e0e0e0',{label:''});
+    html+=`</div>`;
+  }
+
+  // Activity minutes chart
+  if(weeks.some(w=>w.minutes>0)){
+    html+=`<div style="margin-top:12px"><div style="font-size:12px;color:var(--text2);margin-bottom:4px">Activity Minutes / Week</div>`;
+    html+=buildBarChart(weeks.map(w=>({y:w.minutes,label:w.label})),320,100,'#4caf50',{label:''});
+    html+=`</div>`;
+  }
+
+  el.innerHTML=html;
+}
+
+// ── HAPTIC FEEDBACK ──
+function haptic(ms=30){
+  if(navigator.vibrate) navigator.vibrate(ms);
+}
+
+// ── GARMIN INTEGRATION ──
+let garminTab='overview', garminPeriod=30;
+
+function getGarminData(){
+  return LS.get('garmin-data',{heartRate:[],sleep:[],stress:[],bodyBattery:[],steps:[],activities:[],vo2max:[]});
+}
+function setGarminData(d){ LS.set('garmin-data',d); }
+
+function handleGarminImport(event){
+  const files=Array.from(event.target.files);
+  if(!files.length) return;
+  const zipFile=files.find(f=>f.name.endsWith('.zip'));
+  if(zipFile){
+    handleGarminZip(zipFile).then(()=>{ event.target.value=''; });
+    return;
+  }
+  let processed=0, totalRecords=0;
+  const data=getGarminData();
+  const promises=files.map(f=>new Promise((resolve)=>{
+    const reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        const json=JSON.parse(e.target.result);
+        const count=parseGarminJSON(json, f.name, data);
+        totalRecords+=count;
+        processed++;
+      }catch(err){
+        console.warn('Garmin parse error for',f.name,err);
+      }
+      resolve();
+    };
+    reader.readAsText(f);
+  }));
+  Promise.all(promises).then(()=>{
+    deduplicateGarminData(data);
+    setGarminData(data);
+    showToast(`Imported ${totalRecords} Garmin records from ${processed} files`);
+    renderGarmin();
+    event.target.value='';
+  });
+}
+
+async function handleGarminZip(file){
+  showToast('Extracting ZIP archive...',4000);
+  try{
+    const zip=await JSZip.loadAsync(file);
+    const data=getGarminData();
+    let totalRecords=0, fileCount=0;
+    const jsonFiles=[];
+    zip.forEach((path,entry)=>{
+      if(!entry.dir&&(path.endsWith('.json')||path.endsWith('.JSON'))){
+        jsonFiles.push(entry);
+      }
+    });
+    for(const entry of jsonFiles){
+      try{
+        const text=await entry.async('text');
+        const json=JSON.parse(text);
+        const count=parseGarminJSON(json, entry.name, data);
+        totalRecords+=count;
+        if(count>0) fileCount++;
+      }catch(err){
+        console.warn('Garmin ZIP parse error for',entry.name,err);
+      }
+    }
+    deduplicateGarminData(data);
+    setGarminData(data);
+    showToast(`Imported ${totalRecords} records from ${fileCount} files in ZIP`);
+    renderGarmin();
+  }catch(err){
+    console.error('ZIP extraction failed',err);
+    showToast('ZIP extraction failed — try extracting manually');
+  }
+}
+
+function parseGarminJSON(json, filename, data){
+  let count=0;
+  const fn=filename.toLowerCase();
+  // Summarized activities from Garmin Connect export
+  if(Array.isArray(json)&&json.length>0){
+    const first=json[0];
+    // Activity summaries
+    if(first.activityId||first.activityType||(first.activityName&&first.duration)){
+      json.forEach(a=>{
+        data.activities.push({
+          id: a.activityId||Date.now()+Math.random(),
+          name: a.activityName||a.activityType?.typeKey||'Unknown',
+          type: a.activityType?.typeKey||a.activityType||'other',
+          date: (a.startTimeLocal||a.startTimeGMT||'').slice(0,10),
+          startTime: a.startTimeLocal||a.startTimeGMT||'',
+          duration: Math.round((a.duration||0)/1)||0,
+          distance: Math.round((a.distance||0))||0,
+          calories: Math.round(a.calories||a.activeCalories||0),
+          avgHR: Math.round(a.averageHR||0),
+          maxHR: Math.round(a.maxHR||0),
+          elevGain: Math.round(a.elevationGain||0),
+          steps: a.steps||0,
+          avgSpeed: a.averageSpeed||0,
+          vo2max: a.vO2MaxValue||0,
+          trainingEffect: a.aerobicTrainingEffect||a.trainingEffect||0,
+        });
+        count++;
+      });
+    }
+    // Heart rate daily summaries
+    else if(first.restingHeartRate!==undefined||first.calendarDate&&first.maxHeartRate!==undefined){
+      json.forEach(h=>{
+        data.heartRate.push({
+          date: h.calendarDate||h.startTimestampLocal&&new Date(h.startTimestampLocal).toISOString().slice(0,10)||'',
+          resting: h.restingHeartRate||0,
+          max: h.maxHeartRate||0,
+          min: h.minHeartRate||0,
+          avg: h.averageHeartRate||0,
+        });
+        count++;
+      });
+    }
+    // Sleep data
+    else if(first.sleepStartTimestampLocal!==undefined||first.deepSleepSeconds!==undefined||fn.includes('sleep')){
+      json.forEach(s=>{
+        const startDate=s.calendarDate||s.sleepStartTimestampLocal&&new Date(s.sleepStartTimestampLocal).toISOString().slice(0,10)||'';
+        data.sleep.push({
+          date: startDate,
+          deep: Math.round((s.deepSleepSeconds||s.deepSleepDuration||0)/60),
+          light: Math.round((s.lightSleepSeconds||s.lightSleepDuration||0)/60),
+          rem: Math.round((s.remSleepSeconds||s.remSleepDuration||0)/60),
+          awake: Math.round((s.awakeSleepSeconds||s.awakeSleepDuration||0)/60),
+          total: Math.round((s.sleepTimeSeconds||s.unmeasurableSleepSeconds||((s.deepSleepSeconds||0)+(s.lightSleepSeconds||0)+(s.remSleepSeconds||0)+(s.awakeSleepSeconds||0)))/60),
+          score: s.overallSleepScore||s.sleepScores?.overall||0,
+        });
+        count++;
+      });
+    }
+    // Stress data
+    else if(first.averageStressLevel!==undefined||fn.includes('stress')){
+      json.forEach(s=>{
+        data.stress.push({
+          date: s.calendarDate||'',
+          avg: Math.round(s.averageStressLevel||0),
+          max: Math.round(s.maxStressLevel||s.highStressDuration||0),
+          low: Math.round(s.lowStressDuration||0)/60,
+          medium: Math.round(s.mediumStressDuration||0)/60,
+          high: Math.round(s.highStressDuration||0)/60,
+          rest: Math.round(s.restStressDuration||0)/60,
+        });
+        count++;
+      });
+    }
+    // Body battery
+    else if(first.startTimestampLocal&&(first.charged!==undefined||first.drained!==undefined)||fn.includes('battery')||fn.includes('bodyBattery')){
+      json.forEach(b=>{
+        data.bodyBattery.push({
+          date: b.calendarDate||new Date(b.startTimestampLocal||0).toISOString().slice(0,10),
+          high: b.charged||b.bodyBatteryHighValue||0,
+          low: b.drained||b.bodyBatteryLowValue||0,
+          start: b.startingValue||0,
+          end: b.endingValue||0,
+        });
+        count++;
+      });
+    }
+    // Steps data
+    else if(first.totalSteps!==undefined||fn.includes('step')){
+      json.forEach(s=>{
+        data.steps.push({
+          date: s.calendarDate||'',
+          total: s.totalSteps||0,
+          goal: s.dailyStepGoal||s.stepGoal||0,
+          distance: Math.round((s.totalDistanceMeters||0)),
+          calories: Math.round(s.totalKilocalories||s.activeKilocalories||0),
+        });
+        count++;
+      });
+    }
+    // VO2 max
+    else if(first.vo2MaxPreciseValue!==undefined||first.fitnessAge!==undefined||fn.includes('vo2')){
+      json.forEach(v=>{
+        if(v.vo2MaxPreciseValue||v.vo2MaxValue){
+          data.vo2max.push({
+            date: v.calendarDate||'',
+            value: v.vo2MaxPreciseValue||v.vo2MaxValue||0,
+          });
+          count++;
+        }
+      });
+    }
+  }
+  // Single object exports (wellness summaries)
+  else if(json&&typeof json==='object'&&!Array.isArray(json)){
+    if(json.summarizedActivities){
+      return parseGarminJSON(json.summarizedActivities, 'activities.json', data);
+    }
+    Object.keys(json).forEach(key=>{
+      if(Array.isArray(json[key])&&json[key].length>0){
+        count+=parseGarminJSON(json[key], key+'.json', data);
+      }
+    });
+  }
+  return count;
+}
+
+function deduplicateGarminData(data){
+  const dedup=(arr,keyFn)=>{
+    const seen=new Set();
+    return arr.filter(item=>{
+      const key=keyFn(item);
+      if(seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    }).sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  };
+  data.heartRate=dedup(data.heartRate,h=>h.date);
+  data.sleep=dedup(data.sleep,s=>s.date);
+  data.stress=dedup(data.stress,s=>s.date);
+  data.bodyBattery=dedup(data.bodyBattery,b=>b.date);
+  data.steps=dedup(data.steps,s=>s.date);
+  data.activities=dedup(data.activities,a=>a.id||a.date+a.name);
+  data.vo2max=dedup(data.vo2max,v=>v.date);
+}
+
+function filterByPeriod(arr){
+  if(garminPeriod===0) return arr;
+  const cutoff=new Date();
+  cutoff.setDate(cutoff.getDate()-garminPeriod);
+  const cutStr=cutoff.toISOString().slice(0,10);
+  return arr.filter(item=>item.date>=cutStr);
+}
+
+function showGarminTab(tab){
+  garminTab=tab;
+  $$('#garminTabs .garmin-tab').forEach(b=>b.classList.remove('active'));
+  const btn=$$('#garminTabs .garmin-tab')[['overview','heart','sleep','stress','steps','activities'].indexOf(tab)];
+  if(btn) btn.classList.add('active');
+  renderGarminContent();
+}
+
+function setGarminPeriod(days){
+  garminPeriod=days;
+  $$('#garminPeriod button').forEach(b=>b.classList.remove('active'));
+  const idx=[7,30,90,365,0].indexOf(days);
+  const btn=$$('#garminPeriod button')[idx];
+  if(btn) btn.classList.add('active');
+  renderGarminContent();
+}
+
+function clearGarminData(){
+  if(confirm('Remove all imported Garmin data?')){
+    localStorage.removeItem('garmin-data');
+    renderGarmin();
+    showToast('Garmin data cleared');
+  }
+}
+
+function renderGarmin(){
+  const data=getGarminData();
+  const hasData=data.heartRate.length||data.sleep.length||data.steps.length||data.activities.length||data.stress.length;
+  $('#garminEmpty').style.display=hasData?'none':'block';
+  $('#garminDash').style.display=hasData?'block':'none';
+  if(hasData){
+    const total=data.heartRate.length+data.sleep.length+data.stress.length+data.steps.length+data.activities.length;
+    const dates=new Set();
+    [data.heartRate,data.sleep,data.stress,data.steps,data.activities].forEach(arr=>arr.forEach(i=>dates.add(i.date)));
+    const sorted=[...dates].sort();
+    $('#garminMeta').textContent=`${total} records · ${sorted.length} days · ${sorted[0]||'?'} to ${sorted[sorted.length-1]||'?'}`;
+    renderGarminContent();
+  }
+}
+
+function renderGarminContent(){
+  const el=$('#garminContent');
+  if(!el) return;
+  const data=getGarminData();
+  switch(garminTab){
+    case 'overview': el.innerHTML=renderGarminOverview(data); break;
+    case 'heart': el.innerHTML=renderGarminHR(data); break;
+    case 'sleep': el.innerHTML=renderGarminSleep(data); break;
+    case 'stress': el.innerHTML=renderGarminStress(data); break;
+    case 'steps': el.innerHTML=renderGarminSteps(data); break;
+    case 'activities': el.innerHTML=renderGarminActivities(data); break;
+  }
+}
+
+// ── SVG CHART BUILDER ──
+function buildLineChart(points, w, h, color, opts={}){
+  if(!points.length) return '<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center">No data for this period</div>';
+  const {fillOpacity=0.15, showDots=false, yMin:forceMin, yMax:forceMax, label='', secondLine, secondColor='#ff9800'}=opts;
+  const pad={top:24,right:12,bottom:28,left:40};
+  const cw=w-pad.left-pad.right, ch=h-pad.top-pad.bottom;
+  const allVals=points.map(p=>p.y);
+  if(secondLine) secondLine.forEach(p=>allVals.push(p.y));
+  const yMin=forceMin!==undefined?forceMin:Math.min(...allVals);
+  const yMax=forceMax!==undefined?forceMax:Math.max(...allVals);
+  const yRange=yMax-yMin||1;
+
+  const toX=(i)=>pad.left+(i/(points.length-1||1))*cw;
+  const toY=(v)=>pad.top+ch-(((v-yMin)/yRange)*ch);
+
+  let svg=`<svg class="g-chart" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+  // Grid lines
+  const gridSteps=4;
+  for(let i=0;i<=gridSteps;i++){
+    const y=pad.top+(ch/gridSteps)*i;
+    const val=Math.round(yMax-(yRange/gridSteps)*i);
+    svg+=`<line x1="${pad.left}" y1="${y}" x2="${w-pad.right}" y2="${y}" stroke="#222" stroke-width="1"/>`;
+    svg+=`<text x="${pad.left-4}" y="${y+4}" fill="#666" font-size="9" text-anchor="end">${val}</text>`;
+  }
+  // X-axis labels (show ~5 dates)
+  const step=Math.max(1,Math.floor(points.length/5));
+  for(let i=0;i<points.length;i+=step){
+    const x=toX(i);
+    const lbl=points[i].label||points[i].date?.slice(5)||'';
+    svg+=`<text x="${x}" y="${h-4}" fill="#666" font-size="9" text-anchor="middle">${lbl}</text>`;
+  }
+  // Area fill + line
+  const pathPts=points.map((p,i)=>`${toX(i).toFixed(1)},${toY(p.y).toFixed(1)}`);
+  svg+=`<polygon points="${toX(0)},${pad.top+ch} ${pathPts.join(' ')} ${toX(points.length-1)},${pad.top+ch}" fill="${color}" opacity="${fillOpacity}"/>`;
+  svg+=`<polyline points="${pathPts.join(' ')}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+  // Second line
+  if(secondLine&&secondLine.length){
+    const pts2=secondLine.map((p,i)=>`${toX(i).toFixed(1)},${toY(p.y).toFixed(1)}`);
+    svg+=`<polyline points="${pts2.join(' ')}" fill="none" stroke="${secondColor}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="4,3"/>`;
+  }
+  // Dots on last point
+  if(points.length){
+    const last=points[points.length-1];
+    svg+=`<circle cx="${toX(points.length-1)}" cy="${toY(last.y)}" r="4" fill="${color}"/>`;
+    svg+=`<text x="${toX(points.length-1)}" y="${toY(last.y)-8}" fill="${color}" font-size="11" font-weight="600" text-anchor="middle">${last.y}</text>`;
+  }
+  // Label
+  if(label) svg+=`<text x="${pad.left+4}" y="${pad.top-8}" fill="#888" font-size="10">${label}</text>`;
+  svg+=`</svg>`;
+  return svg;
+}
+
+function buildBarChart(points, w, h, colorFn, opts={}){
+  if(!points.length) return '<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center">No data for this period</div>';
+  const {goalLine, label=''}=opts;
+  const pad={top:24,right:12,bottom:28,left:44};
+  const cw=w-pad.left-pad.right, ch=h-pad.top-pad.bottom;
+  const maxVal=Math.max(...points.map(p=>p.y), goalLine||0);
+  const barW=Math.max(2, Math.min(12, (cw/points.length)-2));
+  const gap=(cw-barW*points.length)/(points.length+1);
+
+  let svg=`<svg class="g-chart" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+  // Grid
+  for(let i=0;i<=4;i++){
+    const y=pad.top+(ch/4)*i;
+    const val=Math.round(maxVal-(maxVal/4)*i);
+    svg+=`<line x1="${pad.left}" y1="${y}" x2="${w-pad.right}" y2="${y}" stroke="#222" stroke-width="1"/>`;
+    svg+=`<text x="${pad.left-4}" y="${y+4}" fill="#666" font-size="9" text-anchor="end">${val>=1000?(val/1000).toFixed(0)+'k':val}</text>`;
+  }
+  // Bars
+  points.forEach((p,i)=>{
+    const x=pad.left+gap+(barW+gap)*i;
+    const barH=(p.y/maxVal)*ch;
+    const y=pad.top+ch-barH;
+    const col=typeof colorFn==='function'?colorFn(p):colorFn;
+    svg+=`<rect x="${x}" y="${y}" width="${barW}" height="${barH}" fill="${col}" rx="1.5"/>`;
+  });
+  // Goal line
+  if(goalLine){
+    const gy=pad.top+ch-((goalLine/maxVal)*ch);
+    svg+=`<line x1="${pad.left}" y1="${gy}" x2="${w-pad.right}" y2="${gy}" stroke="#ff9800" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+    svg+=`<text x="${w-pad.right+2}" y="${gy+3}" fill="#ff9800" font-size="9">${goalLine>=1000?(goalLine/1000).toFixed(0)+'k':goalLine}</text>`;
+  }
+  // X labels
+  const step=Math.max(1,Math.floor(points.length/6));
+  for(let i=0;i<points.length;i+=step){
+    const x=pad.left+gap+(barW+gap)*i+barW/2;
+    svg+=`<text x="${x}" y="${h-4}" fill="#666" font-size="9" text-anchor="middle">${points[i].label||''}</text>`;
+  }
+  if(label) svg+=`<text x="${pad.left+4}" y="${pad.top-8}" fill="#888" font-size="10">${label}</text>`;
+  svg+=`</svg>`;
+  return svg;
+}
+
+function buildStackedBarChart(points, w, h, keys, colors){
+  if(!points.length) return '<div style="color:var(--text3);font-size:12px;padding:20px;text-align:center">No data for this period</div>';
+  const pad={top:20,right:12,bottom:28,left:44};
+  const cw=w-pad.left-pad.right, ch=h-pad.top-pad.bottom;
+  const maxVal=Math.max(...points.map(p=>keys.reduce((s,k)=>s+(p[k]||0),0)));
+  const barW=Math.max(3, Math.min(14, (cw/points.length)-2));
+  const gap=(cw-barW*points.length)/(points.length+1);
+
+  let svg=`<svg class="g-chart" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let i=0;i<=4;i++){
+    const y=pad.top+(ch/4)*i;
+    const val=Math.round(((maxVal/60)-(maxVal/60/4)*i));
+    svg+=`<line x1="${pad.left}" y1="${y}" x2="${w-pad.right}" y2="${y}" stroke="#222" stroke-width="1"/>`;
+    svg+=`<text x="${pad.left-4}" y="${y+4}" fill="#666" font-size="9" text-anchor="end">${val}h</text>`;
+  }
+  points.forEach((p,i)=>{
+    const x=pad.left+gap+(barW+gap)*i;
+    let cumY=pad.top+ch;
+    keys.forEach((k,ki)=>{
+      const val=p[k]||0;
+      const barH=(val/(maxVal||1))*ch;
+      cumY-=barH;
+      svg+=`<rect x="${x}" y="${cumY}" width="${barW}" height="${barH}" fill="${colors[ki]}" rx="1"/>`;
+    });
+  });
+  const step=Math.max(1,Math.floor(points.length/6));
+  for(let i=0;i<points.length;i+=step){
+    const x=pad.left+gap+(barW+gap)*i+barW/2;
+    svg+=`<text x="${x}" y="${h-4}" fill="#666" font-size="9" text-anchor="middle">${points[i].label||''}</text>`;
+  }
+  svg+=`</svg>`;
+  return svg;
+}
+
+// ── GARMIN TAB RENDERERS ──
+function renderGarminOverview(data){
+  const hr=filterByPeriod(data.heartRate);
+  const sl=filterByPeriod(data.sleep);
+  const st=filterByPeriod(data.steps);
+  const str=filterByPeriod(data.stress);
+  const bb=filterByPeriod(data.bodyBattery);
+  const acts=filterByPeriod(data.activities);
+
+  const avgHR=hr.length?Math.round(hr.reduce((s,h)=>s+h.resting,0)/hr.length):'-';
+  const avgSleep=sl.length?Math.round(sl.reduce((s,h)=>s+h.total,0)/sl.length):'-';
+  const avgSteps=st.length?Math.round(st.reduce((s,h)=>s+h.total,0)/st.length):'-';
+  const avgStress=str.length?Math.round(str.reduce((s,h)=>s+h.avg,0)/str.length):'-';
+  const avgBB=bb.length?Math.round(bb.reduce((s,h)=>s+h.high,0)/bb.length):'-';
+  const totalActs=acts.length;
+
+  let html=`<div class="g-stats-row">
+    <div class="g-stat"><div class="val" style="color:#e84545">❤️ ${avgHR}</div><div class="lbl">Avg Resting HR</div></div>
+    <div class="g-stat"><div class="val" style="color:#7c4dff">😴 ${avgSleep!=='-'?(avgSleep/60).toFixed(1)+'h':'-'}</div><div class="lbl">Avg Sleep</div></div>
+    <div class="g-stat"><div class="val" style="color:#4caf50">👟 ${avgSteps!=='-'?(avgSteps/1000).toFixed(1)+'k':'-'}</div><div class="lbl">Avg Steps</div></div>
+  </div>
+  <div class="g-stats-row">
+    <div class="g-stat"><div class="val" style="color:#ff9800">🧠 ${avgStress}</div><div class="lbl">Avg Stress</div></div>
+    <div class="g-stat"><div class="val" style="color:#00bcd4">⚡ ${avgBB}</div><div class="lbl">Avg Body Battery</div></div>
+    <div class="g-stat"><div class="val" style="color:#66bb6a">🏃 ${totalActs}</div><div class="lbl">Activities</div></div>
+  </div>`;
+
+  // Mini HR chart
+  if(hr.length>=2){
+    html+=`<div class="g-card"><h4><span class="g-icon">❤️</span> Resting Heart Rate</h4>`;
+    html+=buildLineChart(hr.map(h=>({y:h.resting,label:h.date.slice(5)})),360,140,'#e84545',{label:'bpm',yMin:Math.min(...hr.map(h=>h.resting))-5});
+    html+=`</div>`;
+  }
+  // Mini sleep chart
+  if(sl.length>=2){
+    html+=`<div class="g-card"><h4><span class="g-icon">😴</span> Sleep Duration</h4>`;
+    html+=buildStackedBarChart(sl.map(s=>({deep:s.deep,light:s.light,rem:s.rem,awake:s.awake,label:s.date.slice(5)})),360,140,['deep','light','rem','awake'],['#1a237e','#5c6bc0','#7c4dff','#ff5252']);
+    html+=`<div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:10px;color:var(--text3)">
+      <span><span style="color:#1a237e">●</span> Deep</span>
+      <span><span style="color:#5c6bc0">●</span> Light</span>
+      <span><span style="color:#7c4dff">●</span> REM</span>
+      <span><span style="color:#ff5252">●</span> Awake</span>
+    </div></div>`;
+  }
+  // Mini steps chart
+  if(st.length>=2){
+    const goal=st.find(s=>s.goal)?.goal||10000;
+    html+=`<div class="g-card"><h4><span class="g-icon">👟</span> Daily Steps</h4>`;
+    html+=buildBarChart(st.map(s=>({y:s.total,label:s.date.slice(5)})),360,120,p=>p.y>=goal?'#4caf50':'#666',{goalLine:goal,label:'steps'});
+    html+=`</div>`;
+  }
+  // Recent activities
+  if(acts.length){
+    html+=`<div class="g-card"><h4><span class="g-icon">🏃</span> Recent Activities</h4>`;
+    acts.slice(-5).reverse().forEach(a=>{
+      const dur=a.duration>=3600?`${(a.duration/3600).toFixed(1)}h`:`${Math.round(a.duration/60)}m`;
+      const dist=a.distance>0?`${(a.distance/1000).toFixed(1)}km`:'';
+      const icon=garminActivityIcon(a.type);
+      html+=`<div class="g-activity-item">
+        <div class="g-activity-icon" style="background:var(--card2)">${icon}</div>
+        <div class="g-activity-info">
+          <div class="g-activity-name">${a.name}</div>
+          <div class="g-activity-detail">${a.date} · ${dur}${dist?' · '+dist:''}</div>
+        </div>
+        <div class="g-activity-val">
+          ${a.calories?`<div class="num">${a.calories}</div><div class="unit">cal</div>`:''}
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  // Recovery alerts & anomaly detection
+  const alerts=detectAnomalies(data);
+  if(alerts.length){
+    html+=`<div class="g-card" style="border-left:3px solid #ff9800">
+      <h4><span class="g-icon">⚠️</span> Recovery Alerts</h4>`;
+    alerts.forEach(a=>{
+      const colors={warning:'#ff9800',danger:'#e84545',info:'#4a90d9',good:'#4caf50'};
+      const icons={warning:'⚠️',danger:'🔴',info:'ℹ️',good:'✅'};
+      html+=`<div style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #1e1e1e">
+        <span style="font-size:16px;flex-shrink:0">${icons[a.level]||'⚠️'}</span>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:${colors[a.level]||'#ff9800'}">${a.title}</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:2px">${a.message}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+
+  return html;
+}
+
+function detectAnomalies(data){
+  const alerts=[];
+  const hr=data.heartRate.slice(-14);
+  const sl=data.sleep.slice(-14);
+  const str=data.stress.slice(-14);
+  const bb=data.bodyBattery.slice(-14);
+  const acts=data.activities.slice(-14);
+
+  if(hr.length>=7){
+    // Elevated RHR: last 3 days avg vs previous 7 days avg
+    const recent3=hr.slice(-3);
+    const prev7=hr.slice(-10,-3);
+    if(prev7.length>=5){
+      const avgRecent=recent3.reduce((s,h)=>s+h.resting,0)/recent3.length;
+      const avgPrev=prev7.reduce((s,h)=>s+h.resting,0)/prev7.length;
+      const diff=avgRecent-avgPrev;
+      if(diff>=5){
+        alerts.push({level:'danger',title:'Elevated Resting HR',
+          message:`Your resting HR is ${Math.round(diff)} bpm higher than your recent baseline (${Math.round(avgRecent)} vs ${Math.round(avgPrev)}). This could indicate stress, illness, or overtraining.`});
+      } else if(diff<=-3){
+        alerts.push({level:'good',title:'Resting HR Improving',
+          message:`Your resting HR dropped ${Math.abs(Math.round(diff))} bpm vs your baseline — great recovery trend.`});
+      }
+    }
+
+    // HR spike: single day >10 bpm above 7-day avg
+    if(hr.length>=2){
+      const last=hr[hr.length-1];
+      const avg7=Math.round(hr.slice(-8,-1).reduce((s,h)=>s+h.resting,0)/Math.min(hr.slice(-8,-1).length,7));
+      if(last.resting-avg7>=10){
+        alerts.push({level:'warning',title:'HR Spike Detected',
+          message:`Yesterday's resting HR (${last.resting}) was ${last.resting-avg7} bpm above your 7-day average. Consider a rest day.`});
+      }
+    }
+  }
+
+  // Poor sleep
+  if(sl.length>=3){
+    const last3=sl.slice(-3);
+    const avgSleep=last3.reduce((s,h)=>s+h.total,0)/3;
+    if(avgSleep<360){ // Less than 6h avg over 3 nights
+      alerts.push({level:'warning',title:'Poor Sleep Pattern',
+        message:`You've averaged ${(avgSleep/60).toFixed(1)}h sleep over the last 3 nights. Aim for 7-9 hours for optimal recovery.`});
+    }
+    // Low deep sleep
+    const avgDeep=last3.reduce((s,h)=>s+h.deep,0)/3;
+    if(avgDeep<45){ // Less than 45min deep sleep
+      alerts.push({level:'info',title:'Low Deep Sleep',
+        message:`Only ${Math.round(avgDeep)} min deep sleep avg over 3 nights. Avoid alcohol and screens before bed.`});
+    }
+  }
+
+  // High stress
+  if(str.length>=3){
+    const last3=str.slice(-3);
+    const avgStr=last3.reduce((s,h)=>s+h.avg,0)/3;
+    if(avgStr>=50){
+      alerts.push({level:'danger',title:'High Stress Levels',
+        message:`Average stress of ${Math.round(avgStr)} over the last 3 days. Consider lighter workouts, meditation, or extra rest.`});
+    }
+  }
+
+  // Low body battery
+  if(bb.length>=2){
+    const last=bb[bb.length-1];
+    if(last.high<50){
+      alerts.push({level:'warning',title:'Low Body Battery',
+        message:`Peak body battery only reached ${last.high} yesterday. Your body may not be fully recovering — consider a rest day or gentle activity.`});
+    }
+  }
+
+  // Ghost cardio: steps much higher than activity would explain
+  if(acts.length>=1){
+    const last7days=data.steps.slice(-7);
+    const last7acts=data.activities.filter(a=>{
+      const cutoff=new Date();cutoff.setDate(cutoff.getDate()-7);
+      return a.date>=cutoff.toISOString().slice(0,10);
+    });
+    const avgSteps=last7days.length?last7days.reduce((s,h)=>s+h.total,0)/last7days.length:0;
+    const cardioActs=last7acts.filter(a=>['running','walking','hiking','trail_running','treadmill_running'].includes(a.type));
+    if(avgSteps>15000&&cardioActs.length===0){
+      alerts.push({level:'info',title:'Ghost Cardio',
+        message:`Averaging ${Math.round(avgSteps/1000)}k steps/day but no logged cardio activities. You might be more active than you think — consider tracking walks.`});
+    }
+  }
+
+  // Overtraining: high activity + poor recovery signals
+  if(acts.length>=5&&bb.length>=3){
+    const recent3BB=bb.slice(-3);
+    const avgBBHigh=recent3BB.reduce((s,b)=>s+b.high,0)/3;
+    const recentActs=acts.filter(a=>{const c=new Date();c.setDate(c.getDate()-5);return a.date>=c.toISOString().slice(0,10);});
+    if(recentActs.length>=4&&avgBBHigh<60){
+      alerts.push({level:'danger',title:'Possible Overtraining',
+        message:`${recentActs.length} activities in 5 days with body battery peaking at only ${Math.round(avgBBHigh)}. Your recovery isn't keeping up — schedule a rest day.`});
+    }
+  }
+
+  return alerts;
+}
+
+function renderGarminHR(data){
+  const hr=filterByPeriod(data.heartRate);
+  if(!hr.length) return '<div class="g-card"><p style="color:var(--text3)">No heart rate data imported yet.</p></div>';
+
+  const latest=hr[hr.length-1];
+  const avg=Math.round(hr.reduce((s,h)=>s+h.resting,0)/hr.length);
+  const low=Math.min(...hr.map(h=>h.resting).filter(v=>v>0));
+  const high=Math.max(...hr.map(h=>h.resting));
+
+  let html=`<div class="g-card">
+    <h4><span class="g-icon">❤️</span> Resting Heart Rate</h4>
+    <div class="g-stats-row">
+      <div class="g-stat"><div class="val" style="color:#e84545">${latest.resting}</div><div class="lbl">Latest</div></div>
+      <div class="g-stat"><div class="val">${avg}</div><div class="lbl">Average</div></div>
+      <div class="g-stat"><div class="val">${low}-${high}</div><div class="lbl">Range</div></div>
+    </div>
+    <div class="g-chart-wrap">${buildLineChart(hr.map(h=>({y:h.resting,label:h.date.slice(5)})),360,180,'#e84545',{label:'Resting HR (bpm)',yMin:low-5,yMax:high+5})}</div>
+  </div>`;
+
+  if(hr.some(h=>h.max>0)){
+    html+=`<div class="g-card"><h4><span class="g-icon">💓</span> Max Heart Rate</h4>
+    <div class="g-chart-wrap">${buildLineChart(hr.filter(h=>h.max>0).map(h=>({y:h.max,label:h.date.slice(5)})),360,160,'#ff5252',{label:'Max HR (bpm)'})}</div></div>`;
+  }
+
+  // VO2 Max trend
+  const vo2=filterByPeriod(data.vo2max);
+  if(vo2.length>=2){
+    html+=`<div class="g-card"><h4><span class="g-icon">🫁</span> VO2 Max</h4>
+    <div class="g-chart-wrap">${buildLineChart(vo2.map(v=>({y:v.value,label:v.date.slice(5)})),360,140,'#00bcd4',{label:'mL/kg/min'})}</div></div>`;
+  }
+  return html;
+}
+
+function renderGarminSleep(data){
+  const sl=filterByPeriod(data.sleep);
+  if(!sl.length) return '<div class="g-card"><p style="color:var(--text3)">No sleep data imported yet.</p></div>';
+
+  const latest=sl[sl.length-1];
+  const avgTotal=Math.round(sl.reduce((s,h)=>s+h.total,0)/sl.length);
+  const avgDeep=Math.round(sl.reduce((s,h)=>s+h.deep,0)/sl.length);
+  const avgREM=Math.round(sl.reduce((s,h)=>s+h.rem,0)/sl.length);
+  const bestScore=Math.max(...sl.map(s=>s.score||0));
+
+  let html=`<div class="g-card">
+    <h4><span class="g-icon">😴</span> Sleep Overview</h4>
+    <div class="g-stats-row">
+      <div class="g-stat"><div class="val" style="color:#7c4dff">${(latest.total/60).toFixed(1)}h</div><div class="lbl">Last Night</div></div>
+      <div class="g-stat"><div class="val">${(avgTotal/60).toFixed(1)}h</div><div class="lbl">Average</div></div>
+      <div class="g-stat"><div class="val">${latest.score||'-'}</div><div class="lbl">Sleep Score</div></div>
+    </div>`;
+
+  // Last night breakdown bar
+  if(latest.total>0){
+    const pct=(v)=>((v/latest.total)*100).toFixed(1)+'%';
+    html+=`<div style="margin:12px 0">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Last Night Breakdown</div>
+      <div class="g-sleep-bar">
+        <div style="width:${pct(latest.deep)};background:#1a237e" title="Deep ${Math.round(latest.deep)}m"></div>
+        <div style="width:${pct(latest.light)};background:#5c6bc0" title="Light ${Math.round(latest.light)}m"></div>
+        <div style="width:${pct(latest.rem)};background:#7c4dff" title="REM ${Math.round(latest.rem)}m"></div>
+        <div style="width:${pct(latest.awake)};background:#ff5252" title="Awake ${Math.round(latest.awake)}m"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px">
+        <span>Deep ${Math.round(latest.deep)}m</span>
+        <span>Light ${Math.round(latest.light)}m</span>
+        <span>REM ${Math.round(latest.rem)}m</span>
+        <span>Awake ${Math.round(latest.awake)}m</span>
+      </div>
+    </div>`;
+  }
+  html+=`</div>`;
+
+  // Sleep duration chart
+  html+=`<div class="g-card"><h4><span class="g-icon">📊</span> Sleep Duration Trend</h4>
+    <div class="g-chart-wrap">${buildStackedBarChart(sl.map(s=>({deep:s.deep,light:s.light,rem:s.rem,awake:s.awake,label:s.date.slice(5)})),360,180,['deep','light','rem','awake'],['#1a237e','#5c6bc0','#7c4dff','#ff5252'])}</div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:8px;font-size:10px;color:var(--text3)">
+      <span><span style="color:#1a237e">●</span> Deep ${Math.round(avgDeep)}m avg</span>
+      <span><span style="color:#5c6bc0">●</span> Light</span>
+      <span><span style="color:#7c4dff">●</span> REM ${Math.round(avgREM)}m avg</span>
+      <span><span style="color:#ff5252">●</span> Awake</span>
+    </div></div>`;
+
+  // Sleep score trend
+  const scored=sl.filter(s=>s.score>0);
+  if(scored.length>=2){
+    html+=`<div class="g-card"><h4><span class="g-icon">⭐</span> Sleep Score Trend</h4>
+    <div class="g-chart-wrap">${buildLineChart(scored.map(s=>({y:s.score,label:s.date.slice(5)})),360,140,'#7c4dff',{label:'score',yMin:0,yMax:100})}</div></div>`;
+  }
+  return html;
+}
+
+function renderGarminStress(data){
+  const str=filterByPeriod(data.stress);
+  const bb=filterByPeriod(data.bodyBattery);
+  let html='';
+
+  if(str.length){
+    const latest=str[str.length-1];
+    const avg=Math.round(str.reduce((s,h)=>s+h.avg,0)/str.length);
+    html+=`<div class="g-card">
+      <h4><span class="g-icon">🧠</span> Stress Level</h4>
+      <div class="g-stats-row">
+        <div class="g-stat"><div class="val" style="color:${latest.avg>50?'#ff5252':latest.avg>25?'#ff9800':'#4caf50'}">${latest.avg}</div><div class="lbl">Latest</div></div>
+        <div class="g-stat"><div class="val">${avg}</div><div class="lbl">Average</div></div>
+        <div class="g-stat"><div class="val">${Math.min(...str.map(s=>s.avg))}-${Math.max(...str.map(s=>s.avg))}</div><div class="lbl">Range</div></div>
+      </div>
+      <div class="g-chart-wrap">${buildLineChart(str.map(s=>({y:s.avg,label:s.date.slice(5)})),360,160,'#ff9800',{label:'Avg Stress (0-100)',yMin:0,yMax:100})}</div>
+    </div>`;
+  }
+
+  if(bb.length){
+    const latest=bb[bb.length-1];
+    html+=`<div class="g-card">
+      <h4><span class="g-icon">⚡</span> Body Battery</h4>
+      <div class="g-stats-row">
+        <div class="g-stat"><div class="val" style="color:#00bcd4">${latest.high}</div><div class="lbl">Peak Today</div></div>
+        <div class="g-stat"><div class="val">${latest.low}</div><div class="lbl">Low</div></div>
+        <div class="g-stat"><div class="val">${Math.round(bb.reduce((s,b)=>s+b.high,0)/bb.length)}</div><div class="lbl">Avg Peak</div></div>
+      </div>
+      <div class="g-chart-wrap">${buildLineChart(
+        bb.map(b=>({y:b.high,label:b.date.slice(5)})),360,160,'#00bcd4',
+        {label:'Body Battery (0-100)',yMin:0,yMax:100,secondLine:bb.map(b=>({y:b.low})),secondColor:'#ff5252'}
+      )}</div>
+      <div style="display:flex;gap:16px;justify-content:center;margin-top:6px;font-size:10px;color:var(--text3)">
+        <span><span style="color:#00bcd4">━</span> Peak</span>
+        <span><span style="color:#ff5252">╌</span> Low</span>
+      </div>
+    </div>`;
+  }
+
+  if(!str.length&&!bb.length) html='<div class="g-card"><p style="color:var(--text3)">No stress or body battery data imported yet.</p></div>';
+  return html;
+}
+
+function renderGarminSteps(data){
+  const st=filterByPeriod(data.steps);
+  if(!st.length) return '<div class="g-card"><p style="color:var(--text3)">No steps data imported yet.</p></div>';
+
+  const latest=st[st.length-1];
+  const avg=Math.round(st.reduce((s,h)=>s+h.total,0)/st.length);
+  const best=Math.max(...st.map(s=>s.total));
+  const goal=st.find(s=>s.goal)?.goal||10000;
+  const goalDays=st.filter(s=>s.total>=goal).length;
+
+  let html=`<div class="g-card">
+    <h4><span class="g-icon">👟</span> Steps</h4>
+    <div class="g-stats-row">
+      <div class="g-stat"><div class="val" style="color:#4caf50">${(latest.total/1000).toFixed(1)}k</div><div class="lbl">Latest</div></div>
+      <div class="g-stat"><div class="val">${(avg/1000).toFixed(1)}k</div><div class="lbl">Daily Avg</div></div>
+      <div class="g-stat"><div class="val">${(best/1000).toFixed(1)}k</div><div class="lbl">Best Day</div></div>
+    </div>
+    <div class="g-chart-wrap">${buildBarChart(st.map(s=>({y:s.total,label:s.date.slice(5)})),360,180,p=>p.y>=goal?'#4caf50':'#555',{goalLine:goal,label:'daily steps'})}</div>
+    <div class="g-sub">Goal hit: ${goalDays}/${st.length} days (${Math.round(goalDays/st.length*100)}%)</div>
+  </div>`;
+
+  // Distance
+  const withDist=st.filter(s=>s.distance>0);
+  if(withDist.length>=2){
+    html+=`<div class="g-card"><h4><span class="g-icon">📏</span> Walking Distance</h4>
+    <div class="g-chart-wrap">${buildBarChart(withDist.map(s=>({y:+(s.distance/1000).toFixed(1),label:s.date.slice(5)})),360,140,'#66bb6a',{label:'km'})}</div></div>`;
+  }
+
+  // Calories
+  const withCal=st.filter(s=>s.calories>0);
+  if(withCal.length>=2){
+    html+=`<div class="g-card"><h4><span class="g-icon">🔥</span> Daily Calories</h4>
+    <div class="g-chart-wrap">${buildBarChart(withCal.map(s=>({y:s.calories,label:s.date.slice(5)})),360,140,'#ff9800',{label:'kcal'})}</div></div>`;
+  }
+  return html;
+}
+
+function renderGarminActivities(data){
+  const acts=filterByPeriod(data.activities);
+  if(!acts.length) return '<div class="g-card"><p style="color:var(--text3)">No activity data imported yet.</p></div>';
+
+  // Stats
+  const totalDur=acts.reduce((s,a)=>s+a.duration,0);
+  const totalDist=acts.reduce((s,a)=>s+a.distance,0);
+  const totalCal=acts.reduce((s,a)=>s+a.calories,0);
+
+  // Group by type
+  const byType={};
+  acts.forEach(a=>{
+    const t=a.type||'other';
+    if(!byType[t]) byType[t]={count:0,duration:0,distance:0,name:a.name};
+    byType[t].count++;
+    byType[t].duration+=a.duration;
+    byType[t].distance+=a.distance;
+  });
+  const sorted=Object.entries(byType).sort((a,b)=>b[1].count-a[1].count);
+
+  let html=`<div class="g-card">
+    <h4><span class="g-icon">🏃</span> Activity Summary</h4>
+    <div class="g-stats-row">
+      <div class="g-stat"><div class="val" style="color:#66bb6a">${acts.length}</div><div class="lbl">Activities</div></div>
+      <div class="g-stat"><div class="val">${totalDur>=3600?Math.round(totalDur/3600)+'h':Math.round(totalDur/60)+'m'}</div><div class="lbl">Total Time</div></div>
+      <div class="g-stat"><div class="val">${(totalDist/1000).toFixed(0)}km</div><div class="lbl">Distance</div></div>
+    </div>`;
+  // Type breakdown
+  html+=`<div style="margin:12px 0">`;
+  sorted.forEach(([type, info])=>{
+    const pct=Math.round(info.count/acts.length*100);
+    html+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px">
+      <span style="font-size:18px">${garminActivityIcon(type)}</span>
+      <span style="flex:1">${type.replace(/_/g,' ')}</span>
+      <span style="color:var(--text2)">${info.count}x</span>
+      <div style="width:60px;height:6px;background:var(--card2);border-radius:3px;overflow:hidden">
+        <div style="width:${pct}%;height:100%;background:#4caf50;border-radius:3px"></div>
+      </div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+
+  // Activity list
+  html+=`<div class="g-card"><h4><span class="g-icon">📋</span> All Activities</h4>`;
+  acts.slice().reverse().slice(0,20).forEach(a=>{
+    const dur=a.duration>=3600?`${(a.duration/3600).toFixed(1)}h`:`${Math.round(a.duration/60)}m`;
+    const dist=a.distance>0?` · ${(a.distance/1000).toFixed(1)}km`:'';
+    const hr=a.avgHR>0?` · ❤️ ${a.avgHR}`:'';
+    html+=`<div class="g-activity-item">
+      <div class="g-activity-icon" style="background:var(--card2)">${garminActivityIcon(a.type)}</div>
+      <div class="g-activity-info">
+        <div class="g-activity-name">${a.name}</div>
+        <div class="g-activity-detail">${a.date} · ${dur}${dist}${hr}</div>
+      </div>
+      <div class="g-activity-val">
+        ${a.calories?`<div class="num">${a.calories}</div><div class="unit">cal</div>`:''}
+      </div>
+    </div>`;
+  });
+  if(acts.length>20) html+=`<div style="text-align:center;padding:8px;color:var(--text3);font-size:12px">Showing 20 of ${acts.length} activities</div>`;
+  html+=`</div>`;
+  return html;
+}
+
+function garminActivityIcon(type){
+  const map={
+    running:'🏃',trail_running:'🏃',treadmill_running:'🏃',
+    cycling:'🚴',road_biking:'🚴',mountain_biking:'🚴',indoor_cycling:'🚴',virtual_ride:'🚴',
+    swimming:'🏊',lap_swimming:'🏊',open_water_swimming:'🏊',pool_swimming:'🏊',
+    walking:'🚶',hiking:'🥾',
+    strength_training:'🏋️',cardio:'💪',
+    yoga:'🧘',pilates:'🧘',
+    elliptical:'🏃',stair_climbing:'🪜',
+    skiing:'⛷️',snowboarding:'🏂',
+    rowing:'🚣',kayaking:'🛶',paddleboarding:'🏄',
+    golf:'⛳',tennis:'🎾',pickleball:'🎾',
+    soccer:'⚽',basketball:'🏀',
+    breathwork:'🌬️',meditation:'🧘',
+  };
+  return map[type]||map[type?.toLowerCase()]||'🏅';
+}
+
+// ── GARMIN INIT IN HISTORY ──
+const origRenderHistory=typeof renderHistory==='function'?renderHistory:null;
+
+// Patch renderHistory to also render Garmin
+(function(){
+  const _orig=renderHistory;
+  renderHistory=function(){
+    _orig();
+    renderGarmin();
+  };
+})();
 
 // ── PWA ──
 if('serviceWorker' in navigator){
