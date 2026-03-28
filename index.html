@@ -149,7 +149,8 @@ padding:4px 0;font-size:13px;color:var(--text2);
 font-size:14px;color:var(--text2);margin-bottom:16px;
 display:flex;align-items:center;justify-content:space-between;
 }
-.exercise-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.exercise-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;transition:border .3s}
+.exercise-card.active-exercise{border:1px solid var(--accent-lift)}
 .exercise-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .exercise-name{font-size:18px;font-weight:600}
 .weight-input{
@@ -158,31 +159,71 @@ color:var(--text);padding:6px 8px;font-size:16px;text-align:center;
 }
 .sets-row{display:flex;gap:10px;justify-content:center;margin:12px 0}
 .set-circle{
-width:48px;height:48px;border-radius:50%;border:2px solid #444;
-background:transparent;color:var(--text2);font-size:14px;font-weight:600;
+width:52px;height:52px;border-radius:50%;border:2px solid #444;
+background:transparent;color:var(--text2);font-size:18px;font-weight:700;
 cursor:pointer;display:flex;align-items:center;justify-content:center;
-transition:.2s;
+transition:all .25s;position:relative;
+-webkit-user-select:none;user-select:none;
 }
-.set-circle.done{background:var(--accent-lift);border-color:var(--accent-lift);color:#fff}
-.set-circle.failed{background:#ff9800;border-color:#ff9800;color:#fff;font-size:11px}
+.set-circle.done{
+background:var(--accent-lift);border-color:var(--accent-lift);color:#fff;
+box-shadow:0 0 16px rgba(232,69,69,0.5);
+animation:setGlow 2s ease-out;
+}
+.set-circle.partial{background:#ff9800;border-color:#ff9800;color:#fff}
+.set-circle.failed{background:#555;border-color:#555;color:#999;font-size:14px}
+@keyframes setGlow{
+0%{box-shadow:0 0 24px rgba(232,69,69,0.8);transform:scale(1.15)}
+100%{box-shadow:0 0 16px rgba(232,69,69,0.5);transform:scale(1)}
+}
 .exercise-done{display:flex;align-items:center;gap:8px;color:#4caf50;font-weight:600;font-size:16px}
 .weight-bump{
 margin-top:8px;display:flex;align-items:center;justify-content:space-between;
 font-size:13px;color:var(--text2);
 }
 
-/* REST TIMER */
-.rest-overlay{
-position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.92);
-display:flex;flex-direction:column;align-items:center;justify-content:center;
+/* INLINE REST TIMER */
+.inline-timer{
+text-align:center;padding:12px 0;font-size:13px;color:var(--text2);
 }
-.rest-overlay .time{font-size:72px;font-weight:200;font-variant-numeric:tabular-nums;margin-bottom:8px}
-.rest-overlay .status{font-size:16px;color:var(--text2);margin-bottom:32px}
-.rest-overlay .dismiss{
-background:var(--accent-lift);color:#fff;border:none;border-radius:var(--radius);
-padding:16px 48px;font-size:18px;font-weight:600;cursor:pointer;
+.inline-timer .timer-val{
+font-size:28px;font-weight:300;font-variant-numeric:tabular-nums;color:var(--text);
+margin:4px 0;
 }
-.rest-overlay.hidden{display:none}
+.inline-timer .timer-msg{font-size:12px;color:var(--text3)}
+.setup-next{
+text-align:center;font-size:13px;color:var(--accent-lift);font-weight:600;
+padding:8px 0;animation:pulse 1.5s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+
+/* AFTER BURN */
+.afterburn-section{margin-top:16px}
+.afterburn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
+.afterburn-btn{
+background:var(--card);border:1px solid #333;border-radius:var(--radius);
+padding:12px;text-align:center;cursor:pointer;transition:.15s;
+}
+.afterburn-btn:active{transform:scale(.96);border-color:var(--accent-lift)}
+.afterburn-btn .ab-icon{font-size:24px;margin-bottom:4px}
+.afterburn-btn .ab-name{font-size:12px;color:var(--text2)}
+.afterburn-btn.logged{border-color:#4caf50;background:rgba(76,175,80,0.1)}
+.afterburn-btn.logged .ab-name{color:#4caf50}
+
+/* BONUS SET */
+.bonus-set-btn{
+width:100%;padding:14px;margin-top:8px;border:2px dashed #444;border-radius:var(--radius);
+background:transparent;color:var(--text3);font-size:13px;font-weight:600;
+cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+}
+.bonus-set-btn:active{border-color:var(--accent-lift);color:var(--accent-lift)}
+.bonus-fill{
+position:absolute;left:0;top:0;height:100%;background:rgba(232,69,69,0.2);
+transition:width .1s linear;pointer-events:none;
+}
+
+/* REST TIMER - keep hidden, used for audio only */
+.rest-overlay{display:none}
 
 /* ACTIVITIES */
 .activity-tab-bar{display:flex;gap:4px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px}
@@ -452,12 +493,8 @@ background:rgba(0,120,212,0.2);color:#4a9eff;margin-left:6px;
 <div id="sheetContent"></div>
 </div>
 
-<!-- REST TIMER OVERLAY -->
-<div class="rest-overlay hidden" id="restOverlay">
-<div class="time" id="restTime">0:00</div>
-<div class="status" id="restStatus">Rest — waiting for 1:30 ding</div>
-<button class="dismiss" onclick="dismissRest()">Done Resting</button>
-</div>
+<!-- REST TIMER (hidden - inline timer used instead) -->
+<div class="rest-overlay hidden" id="restOverlay"></div>
 
 <!-- DAY POPUP -->
 <div class="day-popup-overlay" id="dayPopupOverlay" style="display:none" onclick="closeDayPopup()"></div>
@@ -1087,6 +1124,15 @@ function buildSparkline(data,w=80,h=24){
 const workoutA=['Squats','Overhead Press','Deadlift'];
 const workoutB=['Squats','Bench Press','Barbell Row'];
 
+const afterBurnDefs=[
+  {id:'pushups',name:'Push-ups',icon:'💪',type:'reps'},
+  {id:'pullups_ab',name:'Pull-ups',icon:'🫸',type:'reps'},
+  {id:'calf_raises',name:'Calf Raises',icon:'🦵',type:'reps'},
+  {id:'dead_hang',name:'Dead Hang',icon:'🧗',type:'time'},
+  {id:'flys',name:'Flys',icon:'🦅',type:'reps'},
+  {id:'farmers_carry',name:'Farmer\'s Carry',icon:'🏋️',type:'time'},
+];
+
 function getCurrentWorkout(){
   return LS.get('lastWorkout','A');
 }
@@ -1097,6 +1143,10 @@ function switchWorkout(){
   renderLift();
 }
 
+// Track double-tap state per circle
+let lastTapTime={};
+let lastTapKey='';
+
 function renderLift(){
   const w=getCurrentWorkout();
   const exercises=w==='A'?workoutA:workoutB;
@@ -1105,149 +1155,315 @@ function renderLift(){
 
   const todaySets=LS.get(`lift-${today()}`,{});
   let html='';
-  exercises.forEach(ex=>{
+
+  exercises.forEach((ex,exIdx)=>{
     const key=ex.toLowerCase().replace(/\s/g,'_');
     const weight=LS.get(`weight-${key}`,45);
     const sets=todaySets[key]||[false,false,false,false,false];
-    const allDone=sets.every(s=>s==='done'||s==='failed'||s===true);
-
-    if(allDone) return; // Exercise done — hide it
-
-    const failCount=sets.filter(s=>s==='failed').length;
+    const allDone=sets.every(s=>s);
+    const doneCount=sets.filter(s=>s).length;
+    const failCount=sets.filter(s=>typeof s==='number').length;
     const hist=LS.get(`weight-hist-${key}`,[]).slice(-10);
-    html+=`<div class="exercise-card" id="ex-${key}">`;
+
+    html+=`<div class="exercise-card${!allDone&&doneCount>0?' active-exercise':''}" id="ex-${key}">`;
     html+=`<div class="exercise-header">
-      <span class="exercise-name">${ex}</span>
+      <span class="exercise-name">${allDone?'✓ ':''} ${ex}</span>
       <div><input type="number" class="weight-input" value="${weight}"
-        onchange="LS.set('weight-${key}',+this.value)" step="5">
+        onchange="updateWeight('${key}',+this.value)" step="5">
       <span style="font-size:12px;color:var(--text3)">lbs</span></div>
     </div>`;
     if(hist.length>=2){
       html+=`<div style="margin-bottom:8px">${buildSparkline(hist.map(h=>h.weight),80,24)}</div>`;
     }
-    html+=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px">5 sets × 5 reps${failCount?' · <span style="color:#ff9800">long-press = failed set</span>':' · hold to mark failed'}</div>
-    <div class="sets-row">`;
+
+    html+=`<div class="sets-row">`;
     for(let i=0;i<5;i++){
       const st=sets[i];
-      const cls=st==='failed'?'failed':(st?'done':'');
-      const label=st==='failed'?'F':(i+1);
+      let cls='', label='5';
+      if(st==='done'||st===true){
+        cls='done'; label='✓';
+      } else if(typeof st==='number'){
+        // Partial/failed: number is reps completed (0-4)
+        cls=st===0?'failed':'partial';
+        label=st.toString();
+      } else {
+        label='5'; // Target reps
+      }
       html+=`<button class="set-circle ${cls}"
-        onclick="completeSet('${key}',${i})"
-        oncontextmenu="event.preventDefault();failSet('${key}',${i})"
-        ontouchstart="startLongPress(event,'${key}',${i})"
-        ontouchend="cancelLongPress()"
-        ontouchmove="cancelLongPress()">${label}</button>`;
+        onclick="handleSetTap('${key}',${i})"
+        data-key="${key}" data-idx="${i}">${label}</button>`;
     }
     html+=`</div>`;
+
+    // Status row
+    if(allDone){
+      const allSuccess=sets.every(s=>s==='done'||s===true);
+      if(allSuccess){
+        html+=`<div style="text-align:center;font-size:12px;color:#4caf50;margin-top:4px">All 5×5 complete at ${weight} lbs — +5 lbs next session</div>`;
+      } else {
+        const totalReps=sets.reduce((s,v)=>s+(v==='done'||v===true?5:(typeof v==='number'?v:0)),0);
+        html+=`<div style="text-align:center;font-size:12px;color:#ff9800;margin-top:4px">${totalReps}/25 reps — keep at ${weight} lbs next session</div>`;
+      }
+      // Bonus set option
+      html+=`<button class="bonus-set-btn" ontouchstart="startBonusHold('${key}')" ontouchend="cancelBonusHold()" ontouchmove="cancelBonusHold()" onmousedown="startBonusHold('${key}')" onmouseup="cancelBonusHold()">
+        <div class="bonus-fill" id="bonus-fill-${key}"></div>
+        Hold for bonus set 💥
+      </button>`;
+    } else {
+      html+=`<div style="text-align:center;font-size:11px;color:var(--text3);margin-top:4px">tap = done · double-tap = count down reps</div>`;
+    }
+
     html+=`</div>`;
   });
 
-  // If all exercises done, show completion summary
+  // Inline timer (shown between exercises)
+  html+=`<div class="inline-timer" id="liftTimer" style="display:none">
+    <div class="timer-msg" id="liftTimerMsg">Set up next set</div>
+    <div class="timer-val" id="liftTimerVal">0:00</div>
+    <div class="setup-next" id="liftTimerCue" style="display:none">Set up next ↑</div>
+  </div>`;
+
+  // Completion summary
   const allExDone=exercises.every(ex=>{
     const key=ex.toLowerCase().replace(/\s/g,'_');
     const sets=todaySets[key]||[false,false,false,false,false];
-    return sets.every(s=>s==='done'||s==='failed'||s===true);
+    return sets.every(s=>s);
   });
   if(allExDone&&exercises.length){
-    html+=`<div class="card" style="text-align:center">
+    html+=`<div class="card" style="text-align:center;margin-top:16px">
       <div class="exercise-done" style="justify-content:center;margin-bottom:12px">✓ Workout ${w} Complete!</div>`;
     exercises.forEach(ex=>{
       const key=ex.toLowerCase().replace(/\s/g,'_');
       const weight=LS.get(`weight-${key}`,45);
       const sets=todaySets[key]||[];
-      const fails=sets.filter(s=>s==='failed').length;
-      if(fails>0){
-        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a2a">
-          <span>${ex} — ${weight} lbs <span style="color:#ff9800;font-size:12px">(${fails} failed)</span></span>
-          <span style="font-size:12px;color:var(--text3)">Keep weight</span>
-        </div>`;
-      } else {
-        html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a2a">
-          <span>${ex} — ${weight} lbs ✓</span>
-          <button class="btn btn-sm" onclick="bumpWeight('${key}',5)">+5 lbs next time</button>
-        </div>`;
-      }
+      const allSuccess=sets.every(s=>s==='done'||s===true);
+      const totalReps=sets.reduce((s,v)=>s+(v==='done'||v===true?5:(typeof v==='number'?v:0)),0);
+      html+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #2a2a2a">
+        <span>${ex} — ${weight} lbs</span>
+        <span style="font-size:12px;color:${allSuccess?'#4caf50':'#ff9800'}">${totalReps}/25 reps${allSuccess?' · +5 lbs ↑':''}</span>
+      </div>`;
     });
     html+=`</div>`;
+
+    // After Burn section
+    html+=renderAfterBurn();
   }
 
   $('#liftExercises').innerHTML=html;
+
+  // Auto-progress weight for completed exercises
+  if(allExDone){
+    exercises.forEach(ex=>{
+      const key=ex.toLowerCase().replace(/\s/g,'_');
+      const sets=todaySets[key]||[];
+      const allSuccess=sets.every(s=>s==='done'||s===true);
+      const bumped=LS.get(`bumped-${key}-${today()}`,false);
+      if(allSuccess&&!bumped){
+        bumpWeight(key,5);
+        LS.set(`bumped-${key}-${today()}`,true);
+      }
+    });
+  }
 }
 
-let longPressTimer=null;
-let longPressFired=false;
-function startLongPress(e,key,idx){
-  longPressFired=false;
-  longPressTimer=setTimeout(()=>{
-    longPressFired=true;
-    longPressTimer=null;
-    failSet(key,idx);
-  },600);
-}
-function cancelLongPress(){
-  if(longPressTimer){clearTimeout(longPressTimer);longPressTimer=null;}
+function updateWeight(key,val){
+  LS.set(`weight-${key}`,val);
 }
 
-function completeSet(key,idx){
-  if(longPressFired){longPressFired=false;return;} // was a long press
-  cancelLongPress();
+function handleSetTap(key,idx){
+  const now=Date.now();
+  const tapKey=`${key}-${idx}`;
   const todaySets=LS.get(`lift-${today()}`,{});
   if(!todaySets[key]) todaySets[key]=[false,false,false,false,false];
-  if(todaySets[key][idx]) return; // already done
-  todaySets[key][idx]='done';
-  LS.set(`lift-${today()}`,todaySets);
-  logActivity('lift',{exercise:key,set:idx+1});
-  haptic(50);
-  renderLift();
-  startRest();
+  const st=todaySets[key][idx];
+
+  // Already fully done — ignore
+  if(st==='done'||st===true) return;
+
+  // If it's a number (counting down), another tap counts down further
+  if(typeof st==='number'){
+    const newVal=Math.max(0,st-1);
+    todaySets[key][idx]=newVal;
+    LS.set(`lift-${today()}`,todaySets);
+    haptic(30);
+    renderLift();
+    if(newVal===0){
+      // Fully failed — 5 min recovery
+      logActivity('lift',{exercise:key,set:idx+1,failed:true,reps:0});
+      startInlineTimer(300,'Recovery — 5:00',key);
+    }
+    return;
+  }
+
+  // Check for double-tap (within 400ms)
+  if(lastTapKey===tapKey && (now-lastTapTime[tapKey])<400){
+    // Double-tap: start counting down from 4 (missed 1 rep)
+    todaySets[key][idx]=4;
+    LS.set(`lift-${today()}`,todaySets);
+    haptic(30);
+    lastTapKey='';
+    renderLift();
+    return;
+  }
+
+  // Single tap — set a timer to confirm it wasn't a double-tap
+  lastTapKey=tapKey;
+  lastTapTime[tapKey]=now;
+
+  setTimeout(()=>{
+    // If no second tap happened, it was a single tap → complete
+    if(lastTapKey===tapKey && lastTapTime[tapKey]===now){
+      todaySets[key][idx]='done';
+      LS.set(`lift-${today()}`,todaySets);
+      logActivity('lift',{exercise:key,set:idx+1,reps:5});
+      haptic(50);
+      renderLift();
+      // Start 3-min timer with audio dings
+      startInlineTimer(180,'Set up next',key);
+    }
+  },400);
 }
 
-function failSet(key,idx){
+// ── INLINE TIMER (replaces overlay) ──
+let liftTimerInterval=null;
+let liftTimerStart=0;
+let liftDinged90=false, liftDinged180=false, liftDinged300=false;
+
+function startInlineTimer(durationSec,msg,key){
+  clearInterval(liftTimerInterval);
+  liftTimerStart=Date.now();
+  liftDinged90=false; liftDinged180=false; liftDinged300=false;
+  const isRecovery=durationSec>=300;
+
+  // Ensure audio context is alive (user gesture)
+  if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
+
+  const timerEl=$('#liftTimer');
+  const valEl=$('#liftTimerVal');
+  const msgEl=$('#liftTimerMsg');
+  const cueEl=$('#liftTimerCue');
+  if(!timerEl) return;
+
+  timerEl.style.display='block';
+  msgEl.textContent=msg;
+  cueEl.style.display='none';
+
+  liftTimerInterval=setInterval(()=>{
+    const elapsed=Math.floor((Date.now()-liftTimerStart)/1000);
+    const remaining=Math.max(0,durationSec-elapsed);
+    const m=Math.floor(remaining/60);
+    const s=remaining%60;
+    valEl.textContent=`${m}:${s.toString().padStart(2,'0')}`;
+
+    if(!isRecovery){
+      // Normal timer: ding at 1:30, double ding at 3:00
+      if(elapsed>=90&&!liftDinged90){liftDinged90=true;ding(1,0.3);msgEl.textContent='Keep setting up';}
+      if(elapsed>=180&&!liftDinged180){
+        liftDinged180=true;ding(2,0.5);
+        msgEl.textContent='Time to lift!';
+        cueEl.style.display='block';
+      }
+    } else {
+      // Recovery timer: ding at 3:00, double ding at 5:00
+      if(elapsed>=180&&!liftDinged180){liftDinged180=true;ding(1,0.3);msgEl.textContent='Recovery — almost there';}
+      if(elapsed>=300&&!liftDinged300){
+        liftDinged300=true;ding(2,0.5);
+        msgEl.textContent='Recovery complete — let\'s go!';
+        cueEl.style.display='block';
+      }
+    }
+
+    // Auto-hide after duration + 30s
+    if(elapsed>=durationSec+30){
+      clearInterval(liftTimerInterval);
+      timerEl.style.display='none';
+    }
+  },250);
+}
+
+// ── BONUS SET (press and hold) ──
+let bonusHoldTimer=null;
+let bonusAnimFrame=null;
+let bonusStartTime=0;
+const BONUS_HOLD_MS=1500;
+
+function startBonusHold(key){
+  bonusStartTime=Date.now();
+  const fillEl=$(`#bonus-fill-${key}`);
+  if(fillEl) fillEl.style.width='0%';
+
+  function animate(){
+    const elapsed=Date.now()-bonusStartTime;
+    const pct=Math.min(100,elapsed/BONUS_HOLD_MS*100);
+    if(fillEl) fillEl.style.width=pct+'%';
+    if(elapsed>=BONUS_HOLD_MS){
+      // Trigger bonus set!
+      haptic(100);
+      addBonusSet(key);
+      return;
+    }
+    bonusAnimFrame=requestAnimationFrame(animate);
+  }
+  bonusAnimFrame=requestAnimationFrame(animate);
+}
+
+function cancelBonusHold(){
+  if(bonusAnimFrame) cancelAnimationFrame(bonusAnimFrame);
+  // Reset all fills
+  $$('.bonus-fill').forEach(f=>f.style.width='0%');
+}
+
+function addBonusSet(key){
   const todaySets=LS.get(`lift-${today()}`,{});
-  if(!todaySets[key]) todaySets[key]=[false,false,false,false,false];
-  todaySets[key][idx]='failed';
+  if(!todaySets[key]) todaySets[key]=[];
+  todaySets[key].push(false); // Add an extra slot
   LS.set(`lift-${today()}`,todaySets);
-  logActivity('lift',{exercise:key,set:idx+1,failed:true});
-  showToast('Set marked as failed');
+  showToast('Bonus set added! 💥');
   renderLift();
-  startRest();
 }
 
 function bumpWeight(key,amount){
   const cur=LS.get(`weight-${key}`,45);
   LS.set(`weight-${key}`,cur+amount);
-  // Save to weight history
   const hist=LS.get(`weight-hist-${key}`,[]);
-  hist.push({date:today(),weight:cur+amount});
-  LS.set(`weight-hist-${key}`,hist);
+  // Don't double-add same date
+  if(!hist.some(h=>h.date===today())){
+    hist.push({date:today(),weight:cur+amount});
+    LS.set(`weight-hist-${key}`,hist);
+  }
+}
+
+// ── AFTER BURN ──
+function renderAfterBurn(){
+  const logged=LS.get(`afterburn-${today()}`,{});
+  let html=`<div class="afterburn-section">
+    <h3 style="margin-top:20px;display:flex;align-items:center;gap:8px">🔥 After Burn</h3>
+    <div style="font-size:12px;color:var(--text3);margin:4px 0 8px">Optional bonus — active recovery</div>
+    <div class="afterburn-grid">`;
+  afterBurnDefs.forEach(ab=>{
+    const done=logged[ab.id];
+    html+=`<button class="afterburn-btn${done?' logged':''}" onclick="logAfterBurn('${ab.id}')">
+      <div class="ab-icon">${ab.icon}</div>
+      <div class="ab-name">${ab.name}${done?' ✓':''}</div>
+    </button>`;
+  });
+  html+=`</div></div>`;
+  return html;
+}
+
+function logAfterBurn(id){
+  const logged=LS.get(`afterburn-${today()}`,{});
+  if(logged[id]){
+    delete logged[id];
+    showToast('Removed from After Burn');
+  } else {
+    logged[id]=Date.now();
+    const def=afterBurnDefs.find(d=>d.id===id);
+    logActivity('lift',{exercise:def?.name||id,set:'bonus'});
+    showToast(`${def?.name||id} logged! 🔥`);
+  }
+  LS.set(`afterburn-${today()}`,logged);
   renderLift();
-}
-
-// ── REST TIMER ──
-let restInterval=null;
-let restStart=0;
-let dinged90=false,dinged180=false;
-
-function startRest(){
-  restStart=Date.now();dinged90=false;dinged180=false;
-  $('#restOverlay').classList.remove('hidden');
-  $('#restStatus').textContent='Rest — waiting for 1:30 ding';
-  // Ensure audio context is resumed (user gesture)
-  if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume();
-  clearInterval(restInterval);
-  restInterval=setInterval(()=>{
-    const elapsed=Math.floor((Date.now()-restStart)/1000);
-    const m=Math.floor(elapsed/60);
-    const s=elapsed%60;
-    $('#restTime').textContent=`${m}:${s.toString().padStart(2,'0')}`;
-    if(elapsed>=90&&!dinged90){dinged90=true;ding(1,0.3);$('#restStatus').textContent='1:30 — keep resting';}
-    if(elapsed>=180&&!dinged180){dinged180=true;ding(2,0.5);$('#restStatus').textContent='3:00 — time to lift!';}
-  },100);
-}
-
-function dismissRest(){
-  clearInterval(restInterval);
-  $('#restOverlay').classList.add('hidden');
 }
 
 // ── ACTIVITIES ──
