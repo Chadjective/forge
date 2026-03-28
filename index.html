@@ -312,6 +312,29 @@ padding:8px 0;animation:pulse 1.5s infinite;
 }
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 
+/* ACTIVE RECOVERY BUBBLES */
+.recovery-bubbles{margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.recovery-bubble{
+background:var(--card);border:1px solid #333;border-radius:20px;
+padding:6px 14px;font-size:12px;color:var(--text2);cursor:pointer;
+transition:all .2s;display:flex;align-items:center;gap:6px;
+white-space:nowrap;
+}
+.recovery-bubble:active{transform:scale(.94)}
+.recovery-bubble .rb-icon{font-size:16px}
+.recovery-bubble.rb-done{
+border-color:#4caf50;background:rgba(76,175,80,0.12);color:#4caf50;
+}
+.recovery-bubble.rb-done::after{content:' ✓';font-size:10px}
+body.skin-chrome .recovery-bubble{
+background:var(--chrome-shine);border:1px solid #555e68;
+box-shadow:0 2px 4px var(--chrome-shadow),inset 0 1px 0 rgba(255,255,255,0.08);
+color:#c0c8d0;border-radius:var(--set-radius);
+}
+body.skin-chrome .recovery-bubble.rb-done{
+border-color:#4caf50;background:rgba(76,175,80,0.15);color:#66bb6a;
+}
+
 /* AFTER BURN */
 .afterburn-section{margin-top:16px}
 .afterburn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:8px}
@@ -1331,6 +1354,7 @@ function renderLift(){
     <div class="timer-msg" id="liftTimerMsg">Set up next set</div>
     <div class="timer-val" id="liftTimerVal">0:00</div>
     <div class="setup-next" id="liftTimerCue" style="display:none">Set up next ↑</div>
+    <div class="recovery-bubbles" id="recoveryBubbles"></div>
   </div>`;
 
   // Completion summary
@@ -1457,6 +1481,7 @@ function startInlineTimer(durationSec,msg,key){
   timerEl.style.display='block';
   msgEl.textContent=msg;
   cueEl.style.display='none';
+  renderRecoveryBubbles();
 
   liftTimerInterval=setInterval(()=>{
     const elapsed=Math.floor((Date.now()-liftTimerStart)/1000);
@@ -1489,6 +1514,80 @@ function startInlineTimer(durationSec,msg,key){
       timerEl.style.display='none';
     }
   },250);
+}
+
+// ── ACTIVE RECOVERY BUBBLES ──
+const RECOVERY_ACTIVITIES=[
+  // Mobility
+  {id:'kb_worlds',icon:'🔄',name:'KB Around the Worlds',cat:'mobility'},
+  {id:'shoulder_disc',icon:'🦢',name:'Shoulder Dislocates',cat:'mobility'},
+  {id:'hip_90',icon:'🔃',name:'Hip 90/90 Switches',cat:'mobility'},
+  {id:'thoracic_rot',icon:'🌀',name:'Thoracic Rotations',cat:'mobility'},
+  {id:'ankle_circles',icon:'🦶',name:'Ankle Circles',cat:'mobility'},
+  // Core / Stability
+  {id:'dead_bugs',icon:'🪵',name:'Dead Bugs',cat:'core'},
+  {id:'glute_bridges',icon:'🌉',name:'Glute Bridges',cat:'core'},
+  {id:'pallof_hold',icon:'🧘',name:'Pallof Hold',cat:'core'},
+  {id:'copenhagen',icon:'📐',name:'Copenhagen Plank',cat:'core'},
+  // Decompression
+  {id:'box_breathing',icon:'🫁',name:'Box Breathing',cat:'decomp'},
+  {id:'cat_cow',icon:'🐈',name:'Cat-Cow',cat:'decomp'},
+  {id:'dead_hang',icon:'🦧',name:'Dead Hang',cat:'decomp'},
+  {id:'child_pose',icon:'🧎',name:'Child\'s Pose',cat:'decomp'},
+  // Activation
+  {id:'band_pulls',icon:'🪢',name:'Band Pull-Aparts',cat:'activation'},
+  {id:'calf_raises',icon:'🦵',name:'Calf Raises',cat:'activation'},
+  {id:'wrist_circles',icon:'🤲',name:'Wrist Circles',cat:'activation'},
+  {id:'face_pulls',icon:'💪',name:'Face Pulls',cat:'activation'},
+];
+
+function pickRecoverySet(count=4){
+  // Pick one from each category, shuffle
+  const cats=['mobility','core','decomp','activation'];
+  const picks=[];
+  const shuffled=[...RECOVERY_ACTIVITIES].sort(()=>Math.random()-0.5);
+  cats.forEach(cat=>{
+    const item=shuffled.find(a=>a.cat===cat&&!picks.includes(a));
+    if(item) picks.push(item);
+  });
+  // Fill remaining from leftovers if needed
+  while(picks.length<count){
+    const extra=shuffled.find(a=>!picks.includes(a));
+    if(extra) picks.push(extra); else break;
+  }
+  return picks.sort(()=>Math.random()-0.5);
+}
+
+let currentRecoveryPicks=[];
+let recoveryDoneThisRest=new Set();
+
+function renderRecoveryBubbles(){
+  const el=$('#recoveryBubbles');
+  if(!el) return;
+  currentRecoveryPicks=pickRecoverySet(4);
+  recoveryDoneThisRest=new Set();
+  el.innerHTML=currentRecoveryPicks.map(a=>
+    `<button class="recovery-bubble" data-rid="${a.id}" onclick="logRecoveryBubble('${a.id}',this)">
+      <span class="rb-icon">${a.icon}</span>${a.name}
+    </button>`
+  ).join('');
+}
+
+function logRecoveryBubble(id,btn){
+  if(recoveryDoneThisRest.has(id)) return;
+  recoveryDoneThisRest.add(id);
+  btn.classList.add('rb-done');
+  haptic(30);
+
+  // Log to today's recovery record
+  const key='recovery-'+today();
+  const log=LS.get(key,[]);
+  const activity=RECOVERY_ACTIVITIES.find(a=>a.id===id);
+  log.push({id,name:activity?activity.name:id,time:new Date().toISOString()});
+  LS.set(key,log);
+
+  // Show toast
+  toast(`${activity?activity.icon:'✓'} ${activity?activity.name:'Done'}`,1200);
 }
 
 // ── BONUS SET (press and hold) ──
