@@ -476,6 +476,32 @@ background:var(--card);color:var(--text2);font-size:12px;cursor:pointer;
 text-align:center;transition:.15s;min-height:44px;
 }
 .rehab-tab.active{background:var(--accent-stretch);color:#fff}
+
+/* POSITION FILTERS */
+.pos-filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.pos-filter{
+padding:6px 12px;border-radius:16px;border:1px solid #333;background:var(--card);
+color:var(--text2);font-size:11px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:4px;
+}
+.pos-filter.active{border-color:var(--accent-stretch);color:var(--accent-stretch);background:rgba(255,152,0,0.08)}
+.pos-filter .pos-icon{font-size:14px}
+.pos-badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:8px;background:rgba(255,152,0,0.12);color:var(--accent-stretch);margin-left:4px;vertical-align:middle}
+
+/* GUIDED FLOW */
+.guided-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px;background:var(--card);border:1px solid #333;border-radius:var(--radius-sm)}
+.guided-play{width:40px;height:40px;border-radius:50%;border:2px solid var(--accent-stretch);background:transparent;color:var(--accent-stretch);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;flex-shrink:0}
+.guided-play:active{transform:scale(.92)}
+.guided-play.playing{background:var(--accent-stretch);color:#fff}
+.guided-info{flex:1;font-size:12px;color:var(--text2);line-height:1.4}
+.guided-info strong{color:var(--text);display:block;font-size:13px;margin-bottom:2px}
+.guided-progress{width:100%;height:3px;background:#222;border-radius:2px;margin-top:6px;overflow:hidden}
+.guided-progress-fill{height:100%;background:var(--accent-stretch);transition:width .3s;border-radius:2px}
+
+/* Chrome skin overrides */
+body.skin-chrome .pos-filter{background:var(--chrome-shine);border:1px solid #555e68;color:#c0c8d0}
+body.skin-chrome .pos-filter.active{border-color:var(--accent-stretch);color:var(--accent-stretch)}
+body.skin-chrome .guided-bar{background:var(--card);border:1px solid #3a4250}
+
 .exercise-item{
 background:var(--card);border-radius:var(--radius);padding:14px;margin-bottom:10px;
 }
@@ -939,9 +965,24 @@ background:rgba(0,120,212,0.2);color:#4a9eff;margin-left:6px;
 <div class="section" id="sec-rehab">
 <h1>Stretch</h1>
 <div class="rehab-tabs">
-<button class="rehab-tab active" onclick="showRehab('back')">Back Stretches</button>
+<button class="rehab-tab active" onclick="showRehab('back')">Back</button>
 <button class="rehab-tab" onclick="showRehab('lowback')">Low Back</button>
 <button class="rehab-tab" onclick="showRehab('neck')">Neck</button>
+</div>
+<div class="pos-filters" id="posFilters">
+<button class="pos-filter active" data-pos="all" onclick="setPositionFilter('all')"><span class="pos-icon">🔄</span> All</button>
+<button class="pos-filter" data-pos="lying" onclick="setPositionFilter('lying')"><span class="pos-icon">🛏️</span> Lying</button>
+<button class="pos-filter" data-pos="sitting" onclick="setPositionFilter('sitting')"><span class="pos-icon">🪑</span> Sitting</button>
+<button class="pos-filter" data-pos="standing" onclick="setPositionFilter('standing')"><span class="pos-icon">🧍</span> Standing</button>
+<button class="pos-filter" data-pos="kneeling" onclick="setPositionFilter('kneeling')"><span class="pos-icon">🧎</span> Kneeling</button>
+</div>
+<div class="guided-bar" id="guidedBar">
+<button class="guided-play" id="guidedPlayBtn" onclick="toggleGuidedFlow()">▶</button>
+<div class="guided-info">
+<strong id="guidedTitle">Guided Flow</strong>
+<span id="guidedDesc">Hands-free audio walkthrough. Just listen and follow along.</span>
+<div class="guided-progress"><div class="guided-progress-fill" id="guidedProgressFill" style="width:0%"></div></div>
+</div>
 </div>
 <div id="rehabContent"></div>
 </div>
@@ -1173,27 +1214,34 @@ function ding(count=1,vol=0.3){
 
 // ── EXERCISE DATA (must be before renderToday) ──
 const backStretches=[
-  {id:'hamstring',name:'Hamstring Stretch',cue:'Lying on back, lift one leg, keep spine neutral. Grab behind thigh or use a strap.',hold:30,sides:true,reps:3},
-  {id:'knee_chest',name:'Knee to Chest',cue:'Lying on back, bring one knee to chest. Keep spine neutral.',hold:30,sides:true,reps:3},
-  {id:'thread_needle',name:'Thread the Needle',cue:'Lying on back, cross one leg over opposite knee, pull thigh toward chest. Keep hips down.',hold:30,sides:true,reps:3},
-  {id:'spinal_twist',name:'Spinal Twist',cue:'Lying down, bend one knee, pull to opposite side. Reach upper body in opposite direction.',hold:30,sides:true,reps:3},
-  {id:'hip_flexor',name:'Lunge / Hip Flexor Stretch',cue:'Large step forward, neutral spine, tilt pelvis forward. Back knee bent or straight.',hold:30,sides:true,reps:3},
-  {id:'quad_stretch',name:'Quad Stretch',cue:'Standing, hold ankle, bring heel to buttock.',hold:30,sides:true,reps:3},
-  {id:'calf_stretch',name:'Calf Stretch',cue:'Against wall: alternate 10 sec straight leg / 10 sec bent leg.',hold:30,sides:true,reps:3}
+  {id:'hamstring',name:'Hamstring Stretch',cue:'Lying on back, lift one leg, keep spine neutral. Grab behind thigh or use a strap.',hold:30,sides:true,reps:3,pos:'lying'},
+  {id:'knee_chest',name:'Knee to Chest',cue:'Lying on back, bring one knee to chest. Keep spine neutral.',hold:30,sides:true,reps:3,pos:'lying'},
+  {id:'thread_needle',name:'Thread the Needle',cue:'Lying on back, cross one leg over opposite knee, pull thigh toward chest. Keep hips down.',hold:30,sides:true,reps:3,pos:'lying'},
+  {id:'spinal_twist',name:'Spinal Twist',cue:'Lying down, bend one knee, pull to opposite side. Reach upper body in opposite direction.',hold:30,sides:true,reps:3,pos:'lying'},
+  {id:'hip_flexor',name:'Lunge / Hip Flexor Stretch',cue:'Large step forward, neutral spine, tilt pelvis forward. Back knee bent or straight.',hold:30,sides:true,reps:3,pos:'standing'},
+  {id:'quad_stretch',name:'Quad Stretch',cue:'Standing, hold ankle, bring heel to buttock.',hold:30,sides:true,reps:3,pos:'standing'},
+  {id:'calf_stretch',name:'Calf Stretch',cue:'Against wall: alternate 10 sec straight leg / 10 sec bent leg.',hold:30,sides:true,reps:3,pos:'standing'},
+  {id:'seated_forward',name:'Seated Forward Fold',cue:'Sitting on floor, legs extended. Hinge at hips, reach for toes. Keep back flat, breathe into the stretch.',hold:30,sides:false,reps:3,pos:'sitting'},
+  {id:'seated_twist',name:'Seated Spinal Twist',cue:'Sitting, cross one leg over the other. Twist torso toward the raised knee. Use hand behind you for support.',hold:30,sides:true,reps:3,pos:'sitting'},
+  {id:'butterfly',name:'Butterfly Stretch',cue:'Sitting, soles of feet together. Gently press knees toward floor. Keep spine tall.',hold:30,sides:false,reps:3,pos:'sitting'}
 ];
 const lowBackExercises=[
-  {id:'cat_camel',name:'Cat-Camel',cue:'Motion exercise, not a stretch. 5-8 cycles integrating full spine.',hold:0,sides:false,reps:8,isMotion:true},
-  {id:'curl_up',name:'Curl-up',cue:'Hands under lumbar, one knee bent. Raise head and upper shoulders only. 7-8 sec hold.',hold:8,sides:false,reps:5},
-  {id:'side_bridge',name:'Side Bridge',cue:'Elbow and knees (beginner) or elbow and feet (advanced). Neutral spine. 7-8 sec hold.',hold:8,sides:true,reps:5},
-  {id:'birddog',name:'Birddog',cue:'Alternate opposite arm and leg. Sweep floor between reps. 7-8 sec hold.',hold:8,sides:true,reps:5},
-  {id:'bridge',name:'Bridge',cue:'Activate glutes first, weight on heels. 30 sec to 1 min hold.',hold:30,sides:false,reps:5}
+  {id:'cat_camel',name:'Cat-Camel',cue:'Motion exercise, not a stretch. 5-8 cycles integrating full spine.',hold:0,sides:false,reps:8,isMotion:true,pos:'kneeling'},
+  {id:'curl_up',name:'Curl-up',cue:'Hands under lumbar, one knee bent. Raise head and upper shoulders only. 7-8 sec hold.',hold:8,sides:false,reps:5,pos:'lying'},
+  {id:'side_bridge',name:'Side Bridge',cue:'Elbow and knees (beginner) or elbow and feet (advanced). Neutral spine. 7-8 sec hold.',hold:8,sides:true,reps:5,pos:'lying'},
+  {id:'birddog',name:'Birddog',cue:'Alternate opposite arm and leg. Sweep floor between reps. 7-8 sec hold.',hold:8,sides:true,reps:5,pos:'kneeling'},
+  {id:'bridge',name:'Bridge',cue:'Activate glutes first, weight on heels. 30 sec to 1 min hold.',hold:30,sides:false,reps:5,pos:'lying'},
+  {id:'child_pose_lb',name:'Child\'s Pose',cue:'Kneel, sit back on heels, reach arms forward on floor. Breathe deeply into your lower back.',hold:30,sides:false,reps:3,pos:'kneeling'},
+  {id:'seated_cat_cow',name:'Seated Cat-Cow',cue:'Sitting in chair, hands on knees. Arch and round your spine slowly. Breathe with the motion.',hold:0,sides:false,reps:8,isMotion:true,pos:'sitting'}
 ];
 const neckExercises=[
-  {id:'chin_nod',name:'Chin Nod (Lying)',cue:'Small nodding movement toward toes. Don\'t lift head. Use deep neck muscles, not surface ones.',hold:5,sides:false,reps:10},
-  {id:'side_resist',name:'Side Resistance (Lying)',cue:'Hand on side of head, gentle resistance as if bending sideways. Hold.',hold:5,sides:true,reps:10},
-  {id:'prone_float',name:'Prone Head Float',cue:'Lying on tummy, hands under forehead. Nod and float head and breastbone off floor.',hold:5,sides:false,reps:10},
-  {id:'wall_slide',name:'Wall Slide (Standing)',cue:'Back to wall, feet slightly forward. Nod and slide base of skull up wall. Neck lengthens.',hold:5,sides:false,reps:10},
-  {id:'wall_float',name:'Wall Slide + Head Float',cue:'Same as wall slide, then move head away from wall toward floor, return. Don\'t let chin poke forward.',hold:5,sides:false,reps:10}
+  {id:'chin_nod',name:'Chin Nod (Lying)',cue:'Small nodding movement toward toes. Don\'t lift head. Use deep neck muscles, not surface ones.',hold:5,sides:false,reps:10,pos:'lying'},
+  {id:'side_resist',name:'Side Resistance (Lying)',cue:'Hand on side of head, gentle resistance as if bending sideways. Hold.',hold:5,sides:true,reps:10,pos:'lying'},
+  {id:'prone_float',name:'Prone Head Float',cue:'Lying on tummy, hands under forehead. Nod and float head and breastbone off floor.',hold:5,sides:false,reps:10,pos:'lying'},
+  {id:'wall_slide',name:'Wall Slide (Standing)',cue:'Back to wall, feet slightly forward. Nod and slide base of skull up wall. Neck lengthens.',hold:5,sides:false,reps:10,pos:'standing'},
+  {id:'wall_float',name:'Wall Slide + Head Float',cue:'Same as wall slide, then move head away from wall toward floor, return. Don\'t let chin poke forward.',hold:5,sides:false,reps:10,pos:'standing'},
+  {id:'neck_side_bend',name:'Seated Neck Side Bend',cue:'Sitting tall, drop ear to shoulder. Gently press with same-side hand. Keep opposite shoulder down.',hold:15,sides:true,reps:3,pos:'sitting'},
+  {id:'chin_tuck_seated',name:'Seated Chin Tuck',cue:'Sitting tall, draw chin straight back making a double chin. Hold. Strengthens deep neck flexors.',hold:5,sides:false,reps:10,pos:'sitting'}
 ];
 
 // ── NAVIGATION ──
@@ -2170,7 +2218,7 @@ function showRehab(tab){
   $$('.rehab-tab').forEach((t,i)=>t.classList.toggle('active',
     (tab==='back'&&i===0)||(tab==='lowback'&&i===1)||(tab==='neck'&&i===2)));
 
-  const exercises=tab==='back'?backStretches:tab==='lowback'?lowBackExercises:neckExercises;
+  const exercises=getFilteredExercises(tab);
   const todayKey=`rehab-${tab}-${today()}`;
   const completed=LS.get(todayKey,{});
 
@@ -2178,10 +2226,15 @@ function showRehab(tab){
   if(tab==='back') html+=`<p style="font-size:13px;color:var(--text2);margin-bottom:12px">Hold 30 sec each side, 1-3 reps, 2×/day</p>`;
   if(tab==='neck') html+=`<p style="font-size:13px;color:var(--text2);margin-bottom:12px">5-second hold × 10 reps each</p>`;
 
+  if(!exercises.length){
+    html+=`<div style="text-align:center;padding:32px;color:var(--text3)">No ${currentPosFilter} exercises in this category</div>`;
+  }
+
   exercises.forEach(ex=>{
     const state=completed[ex.id]||{leftDone:false,rightDone:false,reps:0,done:false};
+    const posIcons={lying:'🛏️',sitting:'🪑',standing:'🧍',kneeling:'🧎'};
     html+=`<div class="exercise-item">
-      <div class="name">${ex.name} ${state.done?'✓':''}</div>
+      <div class="name">${ex.name} ${state.done?'✓':''}<span class="pos-badge">${posIcons[ex.pos]||''} ${ex.pos}</span></div>
       <div class="cue">${ex.cue}</div>`;
 
     if(ex.isMotion){
@@ -2311,6 +2364,183 @@ function addRehabRep(tab,id,max){
   if(el) el.textContent=completed[id].reps;
   logActivity('stretch',{exercise:id});
 }
+
+// ── POSITION FILTER ──
+let currentPosFilter='all';
+
+function setPositionFilter(pos){
+  currentPosFilter=pos;
+  $$('.pos-filter').forEach(b=>b.classList.toggle('active',b.dataset.pos===pos));
+  showRehab(currentRehabTab);
+}
+
+function getFilteredExercises(tab){
+  const all=tab==='back'?backStretches:tab==='lowback'?lowBackExercises:neckExercises;
+  if(currentPosFilter==='all') return all;
+  return all.filter(ex=>ex.pos===currentPosFilter);
+}
+
+// ── GUIDED AUDIO FLOW ──
+let guidedFlowActive=false;
+let guidedFlowExercises=[];
+let guidedFlowIdx=0;
+let guidedFlowTimeout=null;
+let guidedSpeaking=false;
+
+function speak(text,rate=0.9){
+  return new Promise((resolve)=>{
+    if(!('speechSynthesis' in window)){resolve();return;}
+    window.speechSynthesis.cancel();
+    const utter=new SpeechSynthesisUtterance(text);
+    utter.rate=rate;
+    utter.pitch=0.95;
+    utter.volume=1;
+    // Try to pick a natural voice
+    const voices=window.speechSynthesis.getVoices();
+    const preferred=voices.find(v=>v.name.includes('Samantha')||v.name.includes('Karen')||v.name.includes('Daniel'));
+    if(preferred) utter.voice=preferred;
+    utter.onend=()=>{guidedSpeaking=false;resolve();};
+    utter.onerror=()=>{guidedSpeaking=false;resolve();};
+    guidedSpeaking=true;
+    window.speechSynthesis.speak(utter);
+  });
+}
+
+function toggleGuidedFlow(){
+  if(guidedFlowActive){
+    stopGuidedFlow();
+  } else {
+    startGuidedFlow();
+  }
+}
+
+async function startGuidedFlow(){
+  guidedFlowExercises=getFilteredExercises(currentRehabTab);
+  if(!guidedFlowExercises.length){
+    toast('No exercises for this position',1500);
+    return;
+  }
+
+  guidedFlowActive=true;
+  guidedFlowIdx=0;
+  const btn=$('#guidedPlayBtn');
+  if(btn){btn.textContent='⏹';btn.classList.add('playing');}
+
+  // Intro
+  const posLabel=currentPosFilter==='all'?'full routine':`${currentPosFilter} exercises`;
+  const tabLabel=currentRehabTab==='back'?'back stretches':currentRehabTab==='lowback'?'low back':' neck exercises';
+  await speak(`Starting guided ${tabLabel}. ${guidedFlowExercises.length} ${posLabel}. Get comfortable. Let's begin.`,0.85);
+
+  if(!guidedFlowActive) return;
+  runGuidedExercise();
+}
+
+async function runGuidedExercise(){
+  if(!guidedFlowActive||guidedFlowIdx>=guidedFlowExercises.length){
+    await speak('Great work! Your stretch routine is complete. Take a moment to breathe.',0.85);
+    stopGuidedFlow();
+    return;
+  }
+
+  const ex=guidedFlowExercises[guidedFlowIdx];
+  const total=guidedFlowExercises.length;
+  const progress=((guidedFlowIdx)/total)*100;
+  const progressEl=$('#guidedProgressFill');
+  if(progressEl) progressEl.style.width=progress+'%';
+
+  const titleEl=$('#guidedTitle');
+  const descEl=$('#guidedDesc');
+  if(titleEl) titleEl.textContent=`${guidedFlowIdx+1}/${total}: ${ex.name}`;
+  if(descEl) descEl.textContent=ex.cue;
+
+  // Scroll to the exercise in the list
+  const timerEl=document.getElementById(`timer-${ex.id}`);
+  if(timerEl) timerEl.scrollIntoView({behavior:'smooth',block:'center'});
+
+  // Narrate the exercise
+  if(ex.isMotion){
+    await speak(`Exercise ${guidedFlowIdx+1}. ${ex.name}. ${ex.cue}. Do ${ex.reps} cycles at your own pace.`,0.85);
+    if(!guidedFlowActive) return;
+    // Wait for motion cycles — give them about 3 sec per cycle
+    const motionTime=ex.reps*3000;
+    // Count down cycles
+    for(let c=1;c<=ex.reps;c++){
+      if(!guidedFlowActive) return;
+      await speak(`${c}.`,1.0);
+      await wait(2000);
+    }
+    await speak('Good.',0.9);
+  } else if(ex.sides){
+    // Sided exercise
+    const repsToGuide=Math.min(ex.reps,2); // Guide 2 reps max for flow
+    for(let r=1;r<=repsToGuide;r++){
+      if(!guidedFlowActive) return;
+      if(r===1){
+        await speak(`Exercise ${guidedFlowIdx+1}. ${ex.name}. ${ex.cue}`,0.85);
+      } else {
+        await speak(`Rep ${r}.`,0.9);
+      }
+      if(!guidedFlowActive) return;
+      // Left side
+      await speak('Left side. Hold.',0.9);
+      markSide(currentRehabTab,ex.id,'left');
+      startRehabTimer(ex.id,ex.hold,currentRehabTab);
+      await wait(ex.hold*1000+500);
+      if(!guidedFlowActive) return;
+      // Right side
+      await speak('Switch. Right side. Hold.',0.9);
+      markSide(currentRehabTab,ex.id,'right');
+      startRehabTimer(ex.id,ex.hold,currentRehabTab);
+      await wait(ex.hold*1000+500);
+      if(!guidedFlowActive) return;
+      await speak('Good.',0.9);
+    }
+  } else {
+    // Non-sided exercise
+    const repsToGuide=Math.min(ex.reps,3);
+    await speak(`Exercise ${guidedFlowIdx+1}. ${ex.name}. ${ex.cue}`,0.85);
+    for(let r=1;r<=repsToGuide;r++){
+      if(!guidedFlowActive) return;
+      if(r>1) await speak(`Rep ${r}.`,0.9);
+      startRehabTimer(ex.id,ex.hold,currentRehabTab);
+      await wait(ex.hold*1000+500);
+      if(!guidedFlowActive) return;
+    }
+    await speak('Good.',0.9);
+  }
+
+  if(!guidedFlowActive) return;
+
+  // Brief pause between exercises
+  if(guidedFlowIdx<guidedFlowExercises.length-1){
+    await speak('Relax. Next exercise coming up.',0.85);
+    await wait(2000);
+  }
+
+  guidedFlowIdx++;
+  runGuidedExercise();
+}
+
+function stopGuidedFlow(){
+  guidedFlowActive=false;
+  window.speechSynthesis.cancel();
+  if(guidedFlowTimeout) clearTimeout(guidedFlowTimeout);
+  const btn=$('#guidedPlayBtn');
+  if(btn){btn.textContent='▶';btn.classList.remove('playing');}
+  const titleEl=$('#guidedTitle');
+  const descEl=$('#guidedDesc');
+  const progressEl=$('#guidedProgressFill');
+  if(titleEl) titleEl.textContent='Guided Flow';
+  if(descEl) descEl.textContent='Hands-free audio walkthrough. Just listen and follow along.';
+  if(progressEl) progressEl.style.width='0%';
+}
+
+function wait(ms){
+  return new Promise(r=>{guidedFlowTimeout=setTimeout(r,ms);});
+}
+
+// Preload voices
+if('speechSynthesis' in window) window.speechSynthesis.getVoices();
 
 // ── HISTORY / HEATMAP ──
 let heatmapFilter=null; // null = show all
