@@ -777,6 +777,58 @@ display:inline-flex;align-items:center;gap:3px;padding:2px 6px;
 border-radius:8px;font-size:9px;font-weight:600;
 background:rgba(0,120,212,0.2);color:#4a9eff;margin-left:6px;
 }
+
+/* Garmin screenshot import */
+.garmin-screenshot-btn{
+  background:linear-gradient(135deg,#2d7d46,#1b5e30);color:#fff;border:none;
+  border-radius:var(--radius-sm);padding:10px 16px;font-size:13px;font-weight:600;
+  cursor:pointer;transition:.15s;
+}
+.garmin-screenshot-btn:active{transform:scale(.96)}
+
+/* Garmin activity cards (matching Garmin Connect style) */
+.garmin-activity-card{
+  border-radius:14px;padding:16px;margin-bottom:10px;position:relative;overflow:hidden;
+}
+.garmin-activity-card .card-type{font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;margin-bottom:10px;color:rgba(0,0,0,0.8)}
+.garmin-activity-card .card-primary{font-size:36px;font-weight:800;color:rgba(0,0,0,0.85);line-height:1}
+.garmin-activity-card .card-unit{font-size:14px;font-weight:600;color:rgba(0,0,0,0.6)}
+.garmin-activity-card .card-stats{display:flex;gap:20px;margin-top:4px}
+.garmin-activity-card .card-stat-label{font-size:10px;font-weight:700;text-transform:uppercase;color:rgba(0,0,0,0.5);letter-spacing:0.5px}
+.garmin-activity-card .card-stat-value{font-size:18px;font-weight:700;color:rgba(0,0,0,0.8)}
+
+/* Activity type colors matching Garmin */
+.garmin-card-swim{background:linear-gradient(135deg,#4fc3f7,#0288d1)}
+.garmin-card-walk{background:linear-gradient(135deg,#81c784,#388e3c)}
+.garmin-card-run{background:linear-gradient(135deg,#4db6ac,#00897b)}
+.garmin-card-cycle{background:linear-gradient(135deg,#aed581,#689f38)}
+.garmin-card-strength{background:linear-gradient(135deg,#ffb74d,#f57c00)}
+.garmin-card-yoga{background:linear-gradient(135deg,#ce93d8,#8e24aa)}
+.garmin-card-other{background:linear-gradient(135deg,#90a4ae,#546e7a)}
+
+/* AI Insights */
+.insight-card{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;border-left:3px solid #7c4dff}
+.insight-card h4{font-size:14px;font-weight:700;margin-bottom:6px;color:#bb86fc}
+.insight-card p{font-size:13px;color:var(--text2);line-height:1.5}
+.insight-card .recommendation{background:var(--card2);border-radius:var(--radius-sm);padding:10px;margin-top:10px;font-size:12px;color:var(--text)}
+.insight-card .confidence{font-size:11px;color:var(--text3);margin-top:8px}
+.analyze-btn{
+  background:linear-gradient(135deg,#7c4dff,#651fff);color:#fff;border:none;
+  border-radius:var(--radius-sm);padding:12px 20px;font-size:14px;font-weight:600;
+  cursor:pointer;width:100%;margin-bottom:16px;transition:.15s;
+}
+.analyze-btn:active{transform:scale(.97)}
+.analyze-btn:disabled{opacity:.5;cursor:wait}
+
+/* Desktop layout for garmin dashboard */
+@media(min-width:768px){
+  .garmin-cards-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .g-stats-row{grid-template-columns:repeat(6,1fr)}
+  .garmin-insights-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+}
+@media(min-width:1024px){
+  .garmin-cards-grid{grid-template-columns:repeat(3,1fr)}
+}
 </style>
 </head>
 <body>
@@ -974,6 +1026,10 @@ background:rgba(0,120,212,0.2);color:#4a9eff;margin-left:6px;
 <button class="activity-tab" data-a="sauna" onclick="showActivity('sauna')">🧖 Sauna</button>
 </div>
 <div id="activityForms"></div>
+<div style="margin-top:16px;display:flex;gap:8px">
+<button class="garmin-screenshot-btn" onclick="importGarminScreenshot()">📸 Import Garmin Screenshot</button>
+</div>
+<div id="garminScreenshotCards" style="margin-top:16px"></div>
 </div>
 
 <!-- SECTION: STRETCH -->
@@ -1157,6 +1213,7 @@ background:rgba(0,120,212,0.2);color:#4a9eff;margin-left:6px;
 <div class="garmin-section" id="garminSection">
 <div class="garmin-header">
 <h2>⌚ Garmin</h2>
+<button class="garmin-screenshot-btn" onclick="importGarminScreenshot()" style="margin-right:8px">📸 Screenshot</button>
 <button class="garmin-import-btn" onclick="document.getElementById('garminImport').click()">Import Garmin Data</button>
 <input type="file" id="garminImport" accept=".json,.zip" multiple style="display:none" onchange="handleGarminImport(event)">
 </div>
@@ -1176,6 +1233,7 @@ Then import the JSON files or ZIP archive here to see your heart rate, sleep, st
 <button class="garmin-tab" onclick="showGarminTab('stress')">Stress</button>
 <button class="garmin-tab" onclick="showGarminTab('steps')">Steps</button>
 <button class="garmin-tab" onclick="showGarminTab('activities')">Activities</button>
+<button class="garmin-tab" onclick="showGarminTab('insights')">🧠 Insights</button>
 </div>
 
 <div class="g-period" id="garminPeriod">
@@ -3397,7 +3455,7 @@ function filterByPeriod(arr){
 function showGarminTab(tab){
   garminTab=tab;
   $$('#garminTabs .garmin-tab').forEach(b=>b.classList.remove('active'));
-  const btn=$$('#garminTabs .garmin-tab')[['overview','heart','sleep','stress','steps','activities'].indexOf(tab)];
+  const btn=$$('#garminTabs .garmin-tab')[['overview','heart','sleep','stress','steps','activities','insights'].indexOf(tab)];
   if(btn) btn.classList.add('active');
   renderGarminContent();
 }
@@ -3445,7 +3503,363 @@ function renderGarminContent(){
     case 'stress': el.innerHTML=renderGarminStress(data); break;
     case 'steps': el.innerHTML=renderGarminSteps(data); break;
     case 'activities': el.innerHTML=renderGarminActivities(data); break;
+    case 'insights': el.innerHTML=renderGarminInsights(data); break;
   }
+}
+
+// ── GARMIN SCREENSHOT IMPORT ──
+async function importGarminScreenshot(){
+  const settings=LS.get('replenish-settings',{});
+  const apiKey=settings.apiKey;
+  if(!apiKey){
+    showToast('Add your Claude API key in Replenish → Settings first');
+    return;
+  }
+
+  const input=document.createElement('input');
+  input.type='file';
+  input.accept='image/*';
+  input.capture='environment';
+  input.onchange=async function(){
+    if(!input.files[0]) return;
+    const file=input.files[0];
+    showToast('Analyzing Garmin screenshot...',5000);
+
+    const reader=new FileReader();
+    reader.onload=async function(e){
+      const dataUrl=e.target.result;
+      const base64=dataUrl.split(',')[1];
+      const mediaType=file.type||'image/jpeg';
+
+      try{
+        const activities=await analyzeGarminScreenshot(base64,mediaType,apiKey);
+        if(activities&&activities.length){
+          const data=getGarminData();
+          activities.forEach(a=>{
+            data.activities.push({
+              id: 'ss-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),
+              name: a.name||'Unknown',
+              type: mapGarminType(a.type||a.name||''),
+              date: parseGarminDate(a.date,a.time),
+              startTime: a.time||'',
+              duration: a.duration||0,
+              distance: a.distance||0,
+              calories: a.calories||0,
+              avgHR: a.avgHR||0,
+              maxHR: a.maxHR||0,
+              pace: a.pace||'',
+              sets: a.sets||0,
+              source: 'screenshot'
+            });
+          });
+          deduplicateGarminData(data);
+          setGarminData(data);
+          showToast(`Imported ${activities.length} activities from screenshot`);
+          renderGarmin();
+          if(document.getElementById('garminScreenshotCards')){
+            renderGarminScreenshotCards();
+          }
+        }else{
+          showToast('No activities found in screenshot');
+        }
+      }catch(err){
+        console.error('Screenshot analysis failed:',err);
+        showToast('Analysis failed — try a clearer screenshot');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+async function analyzeGarminScreenshot(base64,mediaType,apiKey){
+  const response=await fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:2048,
+      messages:[{
+        role:'user',
+        content:[
+          {type:'image',source:{type:'base64',media_type:mediaType,data:base64}},
+          {type:'text',text:`Analyze this Garmin Connect screenshot. Extract ALL visible activities/workouts.
+
+For each activity, return a JSON object with these fields:
+{
+  "name": "activity name exactly as shown (e.g. 'Pool Swim', 'Toronto Walking', 'Strength')",
+  "type": "one of: swimming, walking, running, cycling, strength, yoga, other",
+  "date": "date as shown (e.g. '3/29/26' or '2026-03-29')",
+  "time": "start time if shown (e.g. '8:40 PM')",
+  "duration": duration in seconds (e.g. 43:29 = 2609 seconds, 1:53:54 = 6834 seconds),
+  "distance": distance in meters (e.g. 2.09 km = 2090, 2450 m = 2450, 0 if not shown),
+  "calories": calories if shown (number, 0 if not shown),
+  "avgHR": average heart rate if shown (number, 0 if not shown),
+  "pace": "pace as shown (e.g. '1:34', '54:28', '' if not shown)",
+  "sets": number of sets if shown (for strength workouts, 0 otherwise)
+}
+
+Return ONLY a JSON array of activity objects. No other text. Example:
+[{"name":"Pool Swim","type":"swimming","date":"3/29/26","time":"8:40 PM","duration":2609,"distance":2450,"calories":0,"avgHR":0,"pace":"1:34","sets":0}]`}
+        ]
+      }]
+    })
+  });
+
+  const result=await response.json();
+  if(result.error) throw new Error(result.error.message);
+  const text=result.content[0].text;
+  const jsonMatch=text.match(/\[[\s\S]*\]/);
+  if(!jsonMatch) throw new Error('No JSON array found in response');
+  return JSON.parse(jsonMatch[0]);
+}
+
+function mapGarminType(nameOrType){
+  const s=(nameOrType||'').toLowerCase();
+  if(s.includes('swim')||s.includes('pool')) return 'swimming';
+  if(s.includes('walk')) return 'walking';
+  if(s.includes('run')||s.includes('endurance')) return 'running';
+  if(s.includes('cycl')||s.includes('bik')) return 'cycling';
+  if(s.includes('strength')||s.includes('weight')) return 'strength_training';
+  if(s.includes('yoga')) return 'yoga';
+  return 'other';
+}
+
+function parseGarminDate(dateStr, timeStr){
+  if(!dateStr) return today();
+  if(dateStr.includes('/')){
+    const parts=dateStr.split('/');
+    if(parts.length===3){
+      let [m,d,y]=parts;
+      if(y.length===2) y='20'+y;
+      return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+    }
+  }
+  if(dateStr.match(/^\d{4}-/)) return dateStr.slice(0,10);
+  return today();
+}
+
+function getGarminCardColor(type){
+  const t=(type||'').toLowerCase();
+  if(t.includes('swim')||t.includes('pool')) return 'garmin-card-swim';
+  if(t.includes('walk')) return 'garmin-card-walk';
+  if(t.includes('run')||t.includes('endurance')) return 'garmin-card-run';
+  if(t.includes('cycl')||t.includes('bik')) return 'garmin-card-cycle';
+  if(t.includes('strength')||t.includes('weight')) return 'garmin-card-strength';
+  if(t.includes('yoga')) return 'garmin-card-yoga';
+  return 'garmin-card-other';
+}
+
+function formatGarminDuration(secs){
+  if(!secs) return '-';
+  const h=Math.floor(secs/3600);
+  const m=Math.floor((secs%3600)/60);
+  const s=secs%60;
+  if(h>0) return `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  return `${m}:${String(s).padStart(2,'0')}`;
+}
+
+function renderGarminActivityCards(activities){
+  if(!activities||!activities.length) return '<p style="color:var(--text3);text-align:center;padding:20px">No activities yet</p>';
+  let html='<div class="garmin-cards-grid">';
+  activities.slice().reverse().forEach(a=>{
+    const colorClass=getGarminCardColor(a.type||a.name);
+    const icon=garminActivityIcon(a.type);
+    const dur=formatGarminDuration(a.duration);
+
+    let primary='', unit='';
+    if(a.distance>0){
+      if(a.distance>=1000){
+        primary=(a.distance/1000).toFixed(2);
+        unit='KM';
+      }else{
+        primary=a.distance.toLocaleString();
+        unit='M';
+      }
+    }else if(a.duration){
+      primary=dur;
+      unit='';
+    }
+
+    html+=`<div class="garmin-activity-card ${colorClass}">
+      <div class="card-type">${icon} ${a.name||'Activity'}</div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between">
+        <div>
+          <span class="card-primary">${primary}</span>
+          <span class="card-unit">${unit}</span>
+        </div>
+        <div class="card-stats">
+          ${a.duration?`<div><div class="card-stat-label">TIME</div><div class="card-stat-value">${dur}</div></div>`:''}
+          ${a.pace?`<div><div class="card-stat-label">PACE</div><div class="card-stat-value">${a.pace}</div></div>`:''}
+          ${a.sets?`<div><div class="card-stat-label">SETS</div><div class="card-stat-value">${a.sets}</div></div>`:''}
+          ${a.avgHR?`<div><div class="card-stat-label">AVG HR</div><div class="card-stat-value">${a.avgHR}</div></div>`:''}
+        </div>
+      </div>
+      <div style="font-size:11px;color:rgba(0,0,0,0.5);margin-top:8px">${a.date}${a.startTime?' · '+a.startTime:''}</div>
+    </div>`;
+  });
+  html+='</div>';
+  return html;
+}
+
+function renderGarminScreenshotCards(){
+  const el=document.getElementById('garminScreenshotCards');
+  if(!el) return;
+  const data=getGarminData();
+  const recent=data.activities.slice(-20);
+  el.innerHTML=renderGarminActivityCards(recent);
+}
+
+// ── AI INSIGHTS ──
+async function analyzeGarminPatterns(){
+  const settings=LS.get('replenish-settings',{});
+  const apiKey=settings.apiKey;
+  if(!apiKey){
+    showToast('Add your Claude API key in Replenish → Settings first');
+    return;
+  }
+
+  const btn=document.querySelector('.analyze-btn');
+  if(btn){btn.disabled=true;btn.textContent='🔄 Analyzing patterns...';}
+
+  const data=getGarminData();
+
+  const summary={
+    activities: data.activities.slice(-90).map(a=>({name:a.name,type:a.type,date:a.date,duration:Math.round(a.duration/60)+'min',distance:a.distance?Math.round(a.distance)+'m':'',calories:a.calories,avgHR:a.avgHR})),
+    sleep: data.sleep.slice(-90).map(s=>({date:s.date,total:Math.round(s.total)+'min',deep:Math.round(s.deep)+'min',rem:Math.round(s.rem)+'min',score:s.score})),
+    heartRate: data.heartRate.slice(-90).map(h=>({date:h.date,resting:h.resting,avg:h.avg,max:h.max})),
+    stress: data.stress.slice(-90).map(s=>({date:s.date,avg:s.avg})),
+    steps: data.steps.slice(-90).map(s=>({date:s.date,total:s.total})),
+    bodyBattery: data.bodyBattery.slice(-90).map(b=>({date:b.date,high:b.high,low:b.low})),
+  };
+
+  Object.keys(summary).forEach(k=>{if(!summary[k].length) delete summary[k]});
+
+  try{
+    const response=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':apiKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:3000,
+        messages:[{
+          role:'user',
+          content:`You are a sports science and health analytics expert. Analyze this fitness data from a Garmin watch and find meaningful patterns, correlations, and actionable insights.
+
+DATA (last 90 days):
+${JSON.stringify(summary, null, 0)}
+
+Return a JSON array of 4-6 insight objects. Each insight should be:
+{
+  "title": "Short compelling title",
+  "category": "one of: sleep, recovery, training, nutrition, trend, correlation",
+  "icon": "relevant emoji",
+  "finding": "2-3 sentence explanation of what you found in the data",
+  "recommendation": "specific actionable advice based on this finding",
+  "confidence": "high/medium/low based on data quality and sample size",
+  "dataPoints": "key numbers that support this finding"
+}
+
+Focus on:
+1. Sleep quality vs workout intensity correlations
+2. Recovery patterns (rest days, body battery, HR trends)
+3. Training consistency and progression
+4. Overtraining or under-recovery signals
+5. Best performing days/patterns
+6. Actionable changes that would improve results
+
+Be specific to THIS person's actual data. Use actual numbers from their data. Return ONLY the JSON array.`
+        }]
+      })
+    });
+
+    const result=await response.json();
+    if(result.error) throw new Error(result.error.message);
+    const text=result.content[0].text;
+    const jsonMatch=text.match(/\[[\s\S]*\]/);
+    if(!jsonMatch) throw new Error('No JSON found');
+    const insights=JSON.parse(jsonMatch[0]);
+
+    LS.set('garmin-insights',{insights,analyzedAt:new Date().toISOString()});
+    renderInsightsCards(insights);
+
+  }catch(err){
+    console.error('AI analysis failed:',err);
+    showToast('Analysis failed: '+err.message);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='🧠 Analyze Patterns';}
+  }
+}
+
+function renderInsightsCards(insights){
+  const el=document.getElementById('insightsContent');
+  if(!el) return;
+
+  const categoryColors={sleep:'#7c4dff',recovery:'#4caf50',training:'#e84545',nutrition:'#ff9800',trend:'#4a90d9',correlation:'#00bcd4'};
+
+  let html='<div class="garmin-insights-grid">';
+  insights.forEach(ins=>{
+    const color=categoryColors[ins.category]||'#7c4dff';
+    html+=`<div class="insight-card" style="border-left-color:${color}">
+      <h4>${ins.icon||'💡'} ${ins.title}</h4>
+      <p>${ins.finding}</p>
+      <div class="recommendation">💪 ${ins.recommendation}</div>
+      <div class="confidence">
+        <span style="color:${ins.confidence==='high'?'#4caf50':ins.confidence==='medium'?'#ff9800':'#999'}">
+          ${ins.confidence==='high'?'●●●':ins.confidence==='medium'?'●●○':'●○○'} ${ins.confidence} confidence
+        </span>
+        ${ins.dataPoints?` · <span style="color:var(--text2)">${ins.dataPoints}</span>`:''}
+      </div>
+    </div>`;
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+
+function renderGarminInsights(data){
+  let html=`<button class="analyze-btn" onclick="analyzeGarminPatterns()">🧠 Analyze Patterns</button>`;
+  html+=`<p style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:16px">Uses Claude AI to find correlations between your sleep, training, heart rate, and recovery patterns</p>`;
+  html+=`<div id="insightsContent">`;
+
+  const cached=LS.get('garmin-insights',null);
+  if(cached&&cached.insights){
+    const age=Math.round((Date.now()-new Date(cached.analyzedAt).getTime())/(1000*60*60));
+    html+=`<p style="font-size:11px;color:var(--text3);margin-bottom:12px">Last analyzed ${age<24?age+'h':Math.round(age/24)+'d'} ago</p>`;
+    const categoryColors={sleep:'#7c4dff',recovery:'#4caf50',training:'#e84545',nutrition:'#ff9800',trend:'#4a90d9',correlation:'#00bcd4'};
+    html+=`<div class="garmin-insights-grid">`;
+    cached.insights.forEach(ins=>{
+      const color=categoryColors[ins.category]||'#7c4dff';
+      html+=`<div class="insight-card" style="border-left-color:${color}">
+        <h4>${ins.icon||'💡'} ${ins.title}</h4>
+        <p>${ins.finding}</p>
+        <div class="recommendation">💪 ${ins.recommendation}</div>
+        <div class="confidence">
+          <span style="color:${ins.confidence==='high'?'#4caf50':ins.confidence==='medium'?'#ff9800':'#999'}">
+            ${ins.confidence==='high'?'●●●':ins.confidence==='medium'?'●●○':'●○○'} ${ins.confidence} confidence
+          </span>
+          ${ins.dataPoints?` · <span style="color:var(--text2)">${ins.dataPoints}</span>`:''}
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }else{
+    html+=`<div style="text-align:center;padding:30px;color:var(--text3)">
+      <div style="font-size:40px;margin-bottom:12px">🧠</div>
+      <p>Import your Garmin data, then tap Analyze Patterns to discover correlations between your sleep, training, and recovery.</p>
+    </div>`;
+  }
+  html+=`</div>`;
+  return html;
 }
 
 // ── SVG CHART BUILDER ──
